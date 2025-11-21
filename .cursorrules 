@@ -1,0 +1,153 @@
+# Проект: Nuxt 4 + Feature-Sliced Design + PrimeVue
+
+## Архитектура Feature-Sliced Design
+
+### Структура слоёв (Layers)
+Проект использует FSD архитектуру со следующими слоями (от верхнего к нижнему):
+- **app** — инициализация приложения, глобальные стили, провайдеры, layouts, middleware, routes (роуты Nuxt)
+- **pages** — страницы приложения с UI компонентами
+- **widgets** — композиционный слой для соединения сущностей и фич
+- **features** — пользовательские сценарии (авторизация, фильтрация, тестирование и т.д.)
+- **entities** — бизнес-сущности (user, question, test, tag, category и т.д.)
+- **shared** — переиспользуемые компоненты, утилиты, хуки и типы
+- **server** — API endpoints и серверная логика (не является FSD слоем, но часть Nuxt)
+
+### Правила зависимостей
+- Слой может импортировать только из нижележащих слоёв
+- Запрещено: features -> widgets, entities -> features, pages -> widgets
+- Слайсы внутри одного слоя изолированы друг от друга (кроме shared)
+- Всегда используй Public API (index.ts) для экспорта из слайса
+- Для импорта используй алиасы: @shared, @entities, @features, @widgets, @pages
+
+### Алиасы импортов
+Проект использует следующие алиасы (настроены в nuxt.config.ts):
+- `@shared` → `src/shared`
+- `@entities` → `src/entities`
+- `@features` → `src/features`
+- `@widgets` → `src/widgets`
+- `@pages` → `src/pages`
+
+Примеры импортов:
+```typescript
+import { TagFilter } from "@features/tag-filter";
+import { QuestionCard } from "@entities/questions-card";
+import { useLocalStorage } from "@shared/hooks";
+import { HomePage } from "@pages/home";
+```
+
+### Структура слайсов
+
+#### Структура entities, features, widgets
+Каждый слайс должен содержать:
+- `model/` — типы (types.ts) и composables (useFeatureName.ts)
+- `ui/` — Vue компоненты слайса (ComponentName.vue)
+- `style/` (опционально) — CSS файлы для стилизации компонентов
+- `index.ts` — Public API слайса, экспортирует компоненты и типы
+
+Пример структуры:
+```
+feature-name/
+  ├── index.ts          # Public API
+  ├── model/
+  │   ├── types.ts      # TypeScript типы и интерфейсы
+  │   └── useFeatureName.ts  # Composables и логика
+  ├── style/
+  │   └── feature-name.css   # Стили компонента
+  └── ui/
+      └── FeatureName.vue    # Vue компонент
+```
+
+#### Структура pages
+Страницы имеют структуру:
+- `ui/` — Vue компоненты страницы и её секций
+- `index.ts` — Public API страницы
+
+Пример:
+```
+home/
+  ├── index.ts          # Экспортирует HomePage и секции
+  └── ui/
+      ├── home-page.vue
+      ├── HeroSection/
+      └── ProjectsSection/
+```
+
+**Важно:** Файлы роутов Nuxt находятся в `app/routes/`, но используют компоненты из `pages/`
+
+#### Структура shared
+Слой shared содержит:
+- `ui/` — переиспользуемые UI компоненты (автоматически регистрируются с префиксом `Shared`)
+- `hooks/` — переиспользуемые composables (useLocalStorage, useToastClient и т.д.)
+- `types/` — общие TypeScript типы и утилиты
+- `utils/` — вспомогательные функции
+
+### Именование
+- **Папки слайсов:** kebab-case (tag-filter, user-profile, workspace-navigation-menu)
+- **Файлы компонентов:** PascalCase.vue (TagFilter.vue, UserCard.vue)
+- **Файлы типов:** types.ts
+- **Composables:** use + PascalCase.ts (useTagFilter.ts, useAuth.ts)
+- **CSS файлы:** kebab-case (tag-filter.css, action-header.css)
+
+### Server API
+API endpoints находятся в `server/api/`:
+- Структура соответствует RESTful подходу
+- Файлы именуются по HTTP методам: `index.get.ts`, `index.post.ts`, `[id].put.ts`, `[id].delete.ts`
+- Используй Prisma для работы с БД через `server/utils/prisma.ts`
+
+## Технологический стек
+
+### Vue & Nuxt
+- Используй Composition API и `<script setup lang="ts">`
+- Всегда типизируй пропсы через `defineProps<Props>()`
+- Типизируй эмиты через `defineEmits<Emits>()`
+- Используй auto-imports от Nuxt для composables (useState, useFetch и т.д.)
+- Роуты находятся в `app/routes/`, но компоненты страниц — в `pages/`
+- Используй layouts из `app/layouts/` через `definePageMeta({ layout: 'layout-name' })`
+
+### TypeScript
+- Все файлы должны быть `.ts` или `.vue` с `<script setup lang="ts">`
+- Типизируй все пропсы, эмиты, API ответы
+- Используй интерфейсы для описания моделей данных
+- Избегай `any`, используй `unknown` для неизвестных типов
+- Экспортируй типы через Public API слайса
+
+### PrimeVue
+- Используй компоненты PrimeVue как основу для UI
+- Импортируй компоненты явно: `import Button from 'primevue/button'`
+- Используй PrimeVue темы и стили (тема находится в `app/themes/belan-theme.ts`)
+- Компоненты из `shared/ui` автоматически регистрируются с префиксом `Shared`
+- Не создавай обёртки над PrimeVue в shared/ui, используй напрямую в компонентах
+
+### Стилизация
+- Используй CSS модули или `<style scoped>` в компонентах
+- CSS файлы размещай в папке `style/` внутри слайса
+- Глобальные стили размещай в `app/assets/css/`
+- Для утилитарных классов используй PrimeVue утилиты
+- Избегай inline стилей
+
+### Prisma & База данных
+- Схемы Prisma находятся в `prisma/schema/` (разделены на auth.prisma, public.prisma, user_data.prisma)
+- Используй утилиту `server/utils/prisma.ts` для доступа к Prisma Client
+- Миграции находятся в `prisma/migrations/`
+
+### Состояние приложения
+- Используй Pinia для глобального состояния (настроен через @pinia/nuxt)
+- Используй composables для локального состояния компонентов
+- Для тестовых сессий используй store из `entities/test-session-state/store/`
+
+## Дополнительные правила
+
+### Компоненты shared/ui
+- Компоненты из `shared/ui/` автоматически регистрируются глобально с префиксом `Shared`
+- Пример использования: `<SharedFormInput />`, `<SharedTable />`
+- Каждый компонент должен иметь свой `index.ts` для экспорта
+
+### Роутинг
+- Роуты определяются файлами в `app/routes/`
+- Используй вложенные роуты для организации: `workspace/[slug].vue`
+- Middleware находятся в `app/middleware/` и применяются автоматически
+
+### Авторизация
+- Используй `nuxt-auth-utils` для работы с сессиями
+- Проверяй права доступа через middleware (`admin.ts`, `workspace.ts`)
+

@@ -1,0 +1,52 @@
+.action-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  padding: 1.75rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.action-header__info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.action-header__title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.action-header__description {
+  margin: 0.5rem 0 0;
+  color: #6b7280;
+}
+
+.action-header__actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.action-header__search {
+  width: 280px;
+}
+
+@media (max-width: 768px) {
+  .action-header {
+    flex-direction: column;
+  }
+
+  .action-header__search {
+    width: 100%;
+  }
+}
+

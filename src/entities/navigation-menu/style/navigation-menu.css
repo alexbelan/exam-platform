@@ -1,0 +1,85 @@
+.navigation-menu {
+  /* CSS Custom Properties с fallback на переменные темы */
+  --nav-menu-bg: var(--nav-menu-bg-custom, var(--p-surface-0, #ffffff));
+  --nav-menu-text: var(--nav-menu-text-custom, var(--p-text-color, #1f2937));
+  --nav-menu-border: var(--nav-menu-border-custom, var(--p-surface-border, #e5e7eb));
+  
+  /* Активные состояния используют цвета из темы */
+  --nav-menu-active-color: var(--p-primary-color, var(--p-purple-600, #9333ea));
+  --nav-menu-active-hover: var(--p-primary-hover-color, var(--p-purple-700, #7e22ce));
+  --nav-menu-active-bg-light: rgba(168, 85, 247, 0.1);
+  --nav-menu-active-bg-dark: rgba(168, 85, 247, 0.15);
+  --nav-menu-hover-bg-light: var(--p-surface-100, #f3f4f6);
+  --nav-menu-hover-bg-dark: rgba(255, 255, 255, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem 0;
+  background: var(--nav-menu-bg);
+  color: var(--nav-menu-text);
+}
+
+.navigation-menu__link {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  color: var(--nav-menu-text);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  gap: 0.75rem;
+}
+
+.navigation-menu__link:hover {
+  background-color: var(--nav-menu-hover-bg-light);
+  color: var(--nav-menu-active-color);
+}
+
+/* Для темного фона используем другой hover */
+@media (prefers-color-scheme: dark) {
+  .navigation-menu__link:hover {
+    background-color: var(--nav-menu-hover-bg-dark);
+  }
+}
+
+.navigation-menu__link.active,
+.navigation-menu__link.exact-active {
+  background-color: var(--nav-menu-active-bg-light);
+  color: var(--nav-menu-active-color);
+  border-left-color: var(--nav-menu-active-color);
+}
+
+/* Для темного фона используем другой active background */
+@media (prefers-color-scheme: dark) {
+  .navigation-menu__link.active,
+  .navigation-menu__link.exact-active {
+    background-color: var(--nav-menu-active-bg-dark);
+  }
+}
+
+.navigation-menu__icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.navigation-menu__label {
+  font-weight: 500;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .navigation-menu {
+    padding: 0.5rem 0;
+  }
+
+  .navigation-menu__link {
+    padding: 0.9rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .navigation-menu__icon {
+    font-size: 1rem;
+  }
+}
+

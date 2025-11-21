@@ -1,0 +1,104 @@
+// ============================================
+// ОБЩИЕ ДАННЫЕ (Вопросы, Тесты, Теги)
+// ============================================
+
+model Tag {
+  id         Int                 @id @default(autoincrement())
+  name       String              @unique
+  slug       String              @unique
+  categoryId Int?
+  category   Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  questions  InterviewQuestion[] @relation("InterviewQuestionToTag")
+  tests      Test[]
+  primaryForTests Test[]         @relation("PrimaryTag")
+  tagStatistics TagStatistics[]
+
+  @@map("tags")
+}
+
+model Category {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique
+  slug      String       @unique
+  color     String       @default("#3b82f6")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  tags      Tag[]
+
+  @@map("categories")
+}
+
+model InterviewQuestion {
+  id              Int                @id @default(autoincrement())
+  title           String
+  content         String
+  isPublished     Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  categoryId      Int
+  tags            Tag[]              @relation("InterviewQuestionToTag")
+  questionAnswers QuestionAnswer[]
+  favoriteQuestions UserFavoriteQuestion[]
+  testQuestionAnswers TestQuestionAnswer[]
+
+  @@map("interview_questions")
+}
+
+model Answer {
+  id          Int                @id @default(autoincrement())
+  text        String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  questionAnswers QuestionAnswer[]
+
+  @@map("answers")
+}
+
+model QuestionAnswer {
+  id          Int                @id @default(autoincrement())
+  questionId  Int
+  answerId    Int
+  isCorrect   Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  question    InterviewQuestion  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer      Answer             @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, answerId])
+  @@map("question_answers")
+}
+
+model Test {
+  id            Int        @id @default(autoincrement())
+  name          String
+  description   String?
+  questionCount Int
+  questionIds   Int[]      @default([])
+  tags          Tag[]
+  primaryTagId  Int?
+  primaryTag    Tag?       @relation("PrimaryTag", fields: [primaryTagId], references: [id], onDelete: SetNull)
+  isPublished   Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  favoriteTests UserFavoriteTest[]
+  attempts      TestAttempt[]
+
+  @@map("tests")
+}
+
+enum QuestionDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum QuestionType {
+  THEORETICAL
+  PRACTICAL
+  CODE_REVIEW
+  ALGORITHM
+  SYSTEM_DESIGN
+  BEHAVIORAL
+}
+

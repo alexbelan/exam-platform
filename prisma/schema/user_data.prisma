@@ -1,0 +1,168 @@
+// ============================================
+// ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ
+// ============================================
+
+// Центральная таблица профиля пользователя, связывающая все пользовательские данные
+model UserProfile {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favoriteQuestions    UserFavoriteQuestion[]
+  favoriteTests        UserFavoriteTest[]
+  testAttempts         TestAttempt[]
+  learningStatistics   LearningStatistics?
+  userPreferences      UserPreferences?
+
+  @@map("user_profiles")
+}
+
+// Избранные вопросы пользователя для повторного изучения
+model UserFavoriteQuestion {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  profile     UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  questionId  Int
+  question    InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@index([questionId])
+  @@map("user_favorite_questions")
+}
+
+// Избранные тесты пользователя для быстрого доступа
+model UserFavoriteTest {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  profile     UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  testId      Int
+  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, testId])
+  @@index([userId])
+  @@index([testId])
+  @@map("user_favorite_tests")
+}
+
+// Попытка прохождения теста с результатами
+model TestAttempt {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  profile           UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  testId            Int
+  test              Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  
+  totalQuestions    Int
+  correctAnswers     Int
+  score             Decimal
+  timeSpent         Int?
+  startedAt         DateTime  @default(now())
+  completedAt       DateTime?
+  status            TestAttemptStatus @default(COMPLETED)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  questionAnswers   TestQuestionAnswer[]
+
+  @@index([userId])
+  @@index([testId])
+  @@index([userId, testId])
+  @@index([completedAt])
+  @@index([score])
+  @@map("test_attempts")
+}
+
+// Детальные ответы на вопросы в попытке теста (правильные и неправильные)
+model TestQuestionAnswer {
+  id              Int         @id @default(autoincrement())
+  attemptId       Int
+  attempt         TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId      Int
+  question        InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  userAnswerIds   Int[]
+  correctAnswerIds Int[]
+  isCorrect       Boolean
+  timeSpent       Int?
+  
+  createdAt       DateTime    @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([questionId])
+  @@index([attemptId])
+  @@index([isCorrect])
+  @@index([questionId, isCorrect])
+  @@index([attemptId, isCorrect])
+  @@index([createdAt])
+  @@map("test_question_answers")
+}
+
+// Агрегированная статистика обучения пользователя
+model LearningStatistics {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  profile         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  
+  totalTestsCompleted  Int      @default(0)
+  totalQuestionsAnswered Int    @default(0)
+  totalCorrectAnswers  Int       @default(0)
+  averageScore         Decimal   @default(0)
+  uncorrectedQuestionsCount  Int   @default(0)
+  tagStatistics        TagStatistics[]
+  lastActivityAt       DateTime?
+  
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  @@map("learning_statistics")
+}
+
+// Статистика обучения по тегам для детального анализа
+model TagStatistics {
+  id                  Int      @id @default(autoincrement())
+  statisticsId        Int
+  statistics          LearningStatistics @relation(fields: [statisticsId], references: [id], onDelete: Cascade)
+  tagId               Int
+  tag                 Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  questionsAnswered   Int      @default(0)
+  correctAnswers      Int      @default(0)
+  averageScore        Decimal  @default(0)
+  lastPracticedAt     DateTime?
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([statisticsId, tagId])
+  @@index([tagId])
+  @@map("tag_statistics")
+}
+
+// Персональные настройки пользователя (тема, язык, уведомления)
+model UserPreferences {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  profile         UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  
+  theme           String?
+  language        String?  @default("ru")
+  emailNotifications Boolean @default(true)
+  defaultTestSettings Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("user_preferences")
+}
+
+enum TestAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+

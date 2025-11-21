@@ -1,0 +1,24 @@
+.workspace-tests-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  height: 100%;
+}
+
+.workspace-tests-catalog__content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 1.5rem;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .workspace-tests-catalog__content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

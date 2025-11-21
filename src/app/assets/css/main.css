@@ -1,0 +1,240 @@
+/* Импорт PrimeIcons */
+@import "primeicons/primeicons.css";
+
+/* Импорт стилей для highlight.js */
+/* Используем CDN стили, так как путь к npm пакету может отличаться */
+/* Можно также использовать: @import url('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css'); */
+
+/* Импорт Google Fonts */
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"); */
+
+/* Сброс базовых стилей браузера */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Базовые стили для html и body */
+html {
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-weight: 400;
+  color: var(--text-color, #1f2937);
+  background-color: var(--surface-ground, #ffffff);
+  min-height: 100vh;
+}
+
+/* Улучшение читаемости текста */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+/* Улучшение для кнопок и интерактивных элементов */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Улучшение фокуса для доступности */
+:focus-visible {
+  outline: 2px solid var(--p-primary-color, #a855f7);
+  outline-offset: 2px;
+}
+
+/* Утилитарные классы */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* Переопределение стилей PrimeVue для лучшей типографики */
+.p-card .p-card-title {
+  font-family: "Inter", sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.p-card .p-card-content {
+  font-family: "Inter", sans-serif !important;
+}
+
+.p-button {
+  font-family: "Inter", sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.p-inputtext,
+.p-password input {
+  font-family: "Inter", sans-serif !important;
+}
+
+/* Исправление позиционирования иконки в Password компоненте */
+.p-password {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.p-password .p-inputtext,
+.p-password .p-password-input {
+  width: 100% !important;
+  padding-right: 2.5rem !important;
+}
+
+/* Различные возможные классы для иконки переключения */
+.p-password .p-password-toggle-mask-icon,
+.p-password .p-button.p-password-toggle,
+.p-password .p-icon,
+.p-password .pi {
+  position: absolute !important;
+  right: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  cursor: pointer !important;
+  color: var(--p-surface-600, #64748b) !important;
+  font-size: 1.1rem !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.p-password .p-password-toggle-mask-icon:hover,
+.p-password .p-button.p-password-toggle:hover,
+.p-password .p-icon:hover,
+.p-password .pi:hover {
+  color: var(--p-purple-600, #9333ea) !important;
+}
+
+/* Дополнительные стили для обеспечения правильного позиционирования */
+.p-password-panel {
+  display: none !important;
+}
+
+.p-password .p-password-toggle {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Улучшение для форм */
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color-secondary, #6b7280);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,51 @@
+.admin-tag-category-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-tag-category-modal__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-tag-category-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.admin-tag-category-modal__color {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-tag-category-modal__label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.admin-tag-category-modal__picker {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  background: #f9fafb;
+}
+
+.admin-tag-category-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .admin-tag-category-modal__picker {
+    padding: 0.75rem;
+  }
+}

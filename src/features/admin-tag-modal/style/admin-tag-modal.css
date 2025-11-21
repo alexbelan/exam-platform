@@ -1,0 +1,41 @@
+.admin-tag-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-tag-modal__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-tag-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.admin-tag-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-tag-modal__label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.admin-tag-modal__dropdown {
+  width: 100%;
+}
+
+.admin-tag-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}

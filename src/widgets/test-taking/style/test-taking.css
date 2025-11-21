@@ -1,0 +1,37 @@
+.test-taking {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.test-taking__card {
+  width: min(900px, 100%);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.test-taking__card :deep(.p-card-body) {
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.test-taking__card :deep(.p-card-content) {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.test-taking__error {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .test-taking__card :deep(.p-card-body) {
+    padding: 1.5rem;
+  }
+}

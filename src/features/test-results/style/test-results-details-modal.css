@@ -1,0 +1,196 @@
+/* Модалка с результатами теста */
+.test-results-details-modal :deep(.p-dialog-header) {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.test-results-details-modal :deep(.p-dialog-header h3) {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.test-results-details-modal :deep(.p-dialog-content) {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.test-results-details-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.test-results-details-modal__filter {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.test-results-details-modal__filter-buttons {
+  width: 100%;
+}
+
+.test-results-details-modal__filter-buttons :deep(.p-selectbutton) {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.test-results-details-modal__filter-buttons :deep(.p-button) {
+  flex: 1;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
+.test-results-details-modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.test-results-details-modal__item {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.test-results-details-modal__item--correct {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.test-results-details-modal__item--incorrect {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.test-results-details-modal__item--partial {
+  border-color: #f59e0b;
+  background: #fef3c7;
+}
+
+.test-results-details-modal__item-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.test-results-details-modal__item-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.test-results-details-modal__item--correct .test-results-details-modal__item-number {
+  background: #22c55e;
+  color: white;
+}
+
+.test-results-details-modal__item--incorrect .test-results-details-modal__item-number {
+  background: #ef4444;
+  color: white;
+}
+
+.test-results-details-modal__item--partial .test-results-details-modal__item-number {
+  background: #f59e0b;
+  color: white;
+}
+
+.test-results-details-modal__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.test-results-details-modal__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1.5;
+}
+
+.test-results-details-modal__loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.test-results-details-modal__error {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.test-results-details-modal__status-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.test-results-details-modal__icon--correct {
+  color: #22c55e;
+  font-size: 1.5rem;
+}
+
+.test-results-details-modal__icon--incorrect {
+  color: #ef4444;
+  font-size: 1.5rem;
+}
+
+.test-results-details-modal__icon--partial {
+  color: #f59e0b;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .test-results-details-modal :deep(.p-dialog) {
+    width: 95vw !important;
+    margin: 1rem;
+  }
+
+  .test-results-details-modal :deep(.p-dialog-content) {
+    padding: 1rem;
+    max-height: 75vh;
+  }
+
+  .test-results-details-modal__item {
+    padding: 0.875rem 1rem;
+  }
+
+  .test-results-details-modal__title {
+    font-size: 0.95rem;
+  }
+
+  .test-results-details-modal__item-number {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.75rem;
+  }
+
+  .test-results-details-modal__icon--correct,
+  .test-results-details-modal__icon--incorrect,
+  .test-results-details-modal__icon--partial {
+    font-size: 1.25rem;
+  }
+
+  .test-results-details-modal__filter-buttons :deep(.p-button) {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+  }
+}
+

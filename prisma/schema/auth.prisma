@@ -1,0 +1,94 @@
+// ============================================
+// АУТЕНТИФИКАЦИЯ И ПЛАТЕЖИ
+// ============================================
+
+model User {
+  id                 Int              @id @default(autoincrement())
+  email              String           @unique
+  password           String
+  firstName          String?
+  lastName           String?
+  role               UserRole         @default(USER)
+  isActive           Boolean          @default(true)
+  subscriptionType   SubscriptionType @default(FREE)
+  subscriptionEndsAt DateTime?        // Для подписок с ограниченным сроком
+  isLifetimeAccess   Boolean          @default(false) // Для покупки навсегда
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  submittedQuestions UserSubmission[]
+  payments           Payment[]        // Связь с платежами
+
+  @@map("users")
+}
+
+model UserSubmission {
+  id             Int              @id @default(autoincrement())
+  title          String
+  content        String
+  status         SubmissionStatus @default(PENDING)
+  adminResponse  String?
+  isResponseSent Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userId         Int
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_submissions")
+}
+
+model Payment {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount          Decimal       // Сумма платежа
+  currency        String        @default("USD")
+  paymentType     PaymentType   // SUBSCRIPTION или LIFETIME
+  subscriptionPlan SubscriptionPlan? // Для подписок
+  status          PaymentStatus @default(PENDING)
+  paymentProvider String        // stripe, paypal, etc.
+  providerId      String?       // ID платежа в системе провайдера
+  metadata        Json?         // Дополнительные данные
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionType {
+  FREE
+  PREMIUM_MONTHLY
+  PREMIUM_YEARLY
+  LIFETIME
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  LIFETIME
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVISION
+}
+

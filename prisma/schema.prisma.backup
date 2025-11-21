@@ -1,0 +1,194 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int              @id @default(autoincrement())
+  email              String           @unique
+  password           String
+  firstName          String?
+  lastName           String?
+  role               UserRole         @default(USER)
+  isActive           Boolean          @default(true)
+  subscriptionType   SubscriptionType @default(FREE)
+  subscriptionEndsAt DateTime?        // Для подписок с ограниченным сроком
+  isLifetimeAccess   Boolean          @default(false) // Для покупки навсегда
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  submittedQuestions UserSubmission[]
+  payments           Payment[]        // Связь с платежами
+
+  @@map("users")
+}
+
+model Tag {
+  id         Int                 @id @default(autoincrement())
+  name       String              @unique
+  slug       String              @unique
+  categoryId Int?
+  category   Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  questions  InterviewQuestion[] @relation("InterviewQuestionToTag")
+  tests      Test[]
+  primaryForTests Test[]         @relation("PrimaryTag")
+
+  @@map("tags")
+}
+
+model Category {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique
+  slug      String       @unique
+  color     String       @default("#3b82f6")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  tags      Tag[]
+
+  @@map("categories")
+}
+
+model InterviewQuestion {
+  id              Int                @id @default(autoincrement())
+  title           String
+  content         String
+  isPublished     Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  categoryId      Int
+  tags            Tag[]              @relation("InterviewQuestionToTag")
+  questionAnswers QuestionAnswer[]
+
+  @@map("interview_questions")
+}
+
+model Answer {
+  id          Int                @id @default(autoincrement())
+  text        String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  questionAnswers QuestionAnswer[]
+
+  @@map("answers")
+}
+
+model QuestionAnswer {
+  id          Int                @id @default(autoincrement())
+  questionId  Int
+  answerId    Int
+  isCorrect   Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  question    InterviewQuestion  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer      Answer             @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, answerId])
+  @@map("question_answers")
+}
+
+model UserSubmission {
+  id             Int              @id @default(autoincrement())
+  title          String
+  content        String
+  status         SubmissionStatus @default(PENDING)
+  adminResponse  String?
+  isResponseSent Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userId         Int
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_submissions")
+}
+
+model Payment {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount          Decimal       // Сумма платежа
+  currency        String        @default("USD")
+  paymentType     PaymentType   // SUBSCRIPTION или LIFETIME
+  subscriptionPlan SubscriptionPlan? // Для подписок
+  status          PaymentStatus @default(PENDING)
+  paymentProvider String        // stripe, paypal, etc.
+  providerId      String?       // ID платежа в системе провайдера
+  metadata        Json?         // Дополнительные данные
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+model Test {
+  id            Int        @id @default(autoincrement())
+  name          String
+  description   String?
+  questionCount Int
+  questionIds   Int[]      @default([])
+  tags          Tag[]
+  primaryTagId  Int?
+  primaryTag    Tag?       @relation("PrimaryTag", fields: [primaryTagId], references: [id], onDelete: SetNull)
+  isPublished   Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@map("tests")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum QuestionDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum QuestionType {
+  THEORETICAL
+  PRACTICAL
+  CODE_REVIEW
+  ALGORITHM
+  SYSTEM_DESIGN
+  BEHAVIORAL
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVISION
+}
+
+enum SubscriptionType {
+  FREE
+  PREMIUM_MONTHLY
+  PREMIUM_YEARLY
+  LIFETIME
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  LIFETIME
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}

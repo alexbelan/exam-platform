@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1.7
+
+# Development Dockerfile для локальной разработки с Bun
+FROM oven/bun:1 AS base
+WORKDIR /usr/src/app
+
+# Установка системных зависимостей для Prisma
+USER root
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# Установка зависимостей
+FROM base AS deps
+COPY bun.lock package.json ./
+
+# Настройки для улучшения загрузки пакетов
+ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
+ENV BUN_INSTALL_CACHE_DIR=/tmp/.bun-cache
+
+# Установка с retry механизмом
+RUN --mount=type=cache,target=/tmp/.bun-cache \
+  for i in 1 2 3 4 5; do \
+    echo "Попытка установки №$i из 5..."; \
+    if bun install --frozen-lockfile --network-timeout=300000; then \
+      echo "Установка успешна!"; \
+      exit 0; \
+    else \
+      echo "Попытка $i не удалась"; \
+      if [ $i -lt 5 ]; then \
+        echo "Ожидание 10 секунд перед следующей попыткой..."; \
+        sleep 10; \
+      else \
+        echo "Все попытки установки провалились!"; \
+        exit 1; \
+      fi; \
+    fi; \
+  done
+
+# Development образ
+FROM base AS development
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY . .
+
+# Генерация Prisma Client и подготовка Nuxt
+RUN bunx prisma generate && bun run postinstall || true
+
+# Создание необходимых директорий с правильными правами
+RUN mkdir -p .nuxt .output && chown -R bun:bun /usr/src/app
+
+# Переменные окружения для разработки
+ENV NODE_ENV=development
+ENV NITRO_HOST=0.0.0.0
+ENV NITRO_PORT=3000
+
+USER bun
+EXPOSE 3000/tcp
+CMD ["bun", "--bun", "run", "dev"]

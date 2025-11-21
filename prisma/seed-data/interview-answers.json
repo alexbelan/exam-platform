@@ -1,0 +1,842 @@
+[
+  {
+    "questionSlug": "middle-js-closures",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: объясните замыкания в JavaScript.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: объясните замыкания в JavaScript.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: объясните замыкания в JavaScript.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: объясните замыкания в JavaScript решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-event-loop",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: цикл событий и баланс микрозадач.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: цикл событий и баланс микрозадач.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: цикл событий и баланс микрозадач.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: цикл событий и баланс микрозадач решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-promises",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: проектирование цепочек Promise.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: проектирование цепочек Promise.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: проектирование цепочек Promise.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: проектирование цепочек Promise решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-modules",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: организация модулей ES и CommonJS.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: организация модулей ES и CommonJS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: организация модулей ES и CommonJS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: организация модулей ES и CommonJS решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-error-handling",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: обработка ошибок в JavaScript.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: обработка ошибок в JavaScript.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: обработка ошибок в JavaScript.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: обработка ошибок в JavaScript решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-iterators",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: генераторы и итераторы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: генераторы и итераторы.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: генераторы и итераторы.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: генераторы и итераторы решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-performance",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: оптимизация производительности JS.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: оптимизация производительности JS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: оптимизация производительности JS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: оптимизация производительности JS решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-types",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: статическая типизация поверх JavaScript.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: статическая типизация поверх JavaScript.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: статическая типизация поверх JavaScript.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: статическая типизация поверх JavaScript решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-dom-optimizations",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: работа с DOM без лишних перерисовок.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: работа с DOM без лишних перерисовок.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: работа с DOM без лишних перерисовок.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: работа с DOM без лишних перерисовок решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-patterns",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: архитектурные паттерны на чистом JS.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: архитектурные паттерны на чистом JS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: архитектурные паттерны на чистом JS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: архитектурные паттерны на чистом JS решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-functional",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: функциональные приёмы в JS.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: функциональные приёмы в JS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: функциональные приёмы в JS.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: функциональные приёмы в JS решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-testing",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: стратегия тестирования JavaScript-кода.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: стратегия тестирования JavaScript-кода.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: стратегия тестирования JavaScript-кода.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: стратегия тестирования JavaScript-кода решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-bundling",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: настройка сборки и бандлеров.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: настройка сборки и бандлеров.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: настройка сборки и бандлеров.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: настройка сборки и бандлеров решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-security",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: безопасность SPA.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: безопасность SPA.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: безопасность SPA.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: безопасность SPA решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-js-tooling",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: автоматизация и линтинг.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: автоматизация и линтинг.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: автоматизация и линтинг.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: автоматизация и линтинг решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-hooks",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: продвинутые хуки в React.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: продвинутые хуки в React.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: продвинутые хуки в React.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: продвинутые хуки в React решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-state",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: выбор стейт-менеджера.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: выбор стейт-менеджера.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: выбор стейт-менеджера.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: выбор стейт-менеджера решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-context",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: оптимизация Context API.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: оптимизация Context API.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: оптимизация Context API.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: оптимизация Context API решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-performance",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: производительность React-компонентов.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: производительность React-компонентов.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: производительность React-компонентов.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: производительность React-компонентов решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-suspense",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: применение Suspense.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: применение Suspense.",
+        "isCorrect": false
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: применение Suspense.",
+        "isCorrect": false
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: применение Suspense решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-forms",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: сложные формы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: сложные формы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: сложные формы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: сложные формы решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-routing",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: архитектура маршрутизации.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: архитектура маршрутизации.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: архитектура маршрутизации.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: архитектура маршрутизации решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-server-components",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: React Server Components.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: React Server Components.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: React Server Components.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: React Server Components решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-testing",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: тестирование React UI.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: тестирование React UI.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: тестирование React UI.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: тестирование React UI решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-error-boundaries",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: error boundary как часть UX.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: error boundary как часть UX.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: error boundary как часть UX.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: error boundary как часть UX решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-concurrency",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: concurrent возможности.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: concurrent возможности.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: concurrent возможности.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: concurrent возможности решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-architecture",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: архитектура модульного React.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: архитектура модульного React.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: архитектура модульного React.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: архитектура модульного React решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-patterns",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: композиционные паттерны.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: композиционные паттерны.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: композиционные паттерны.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: композиционные паттерны решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-animations",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: анимации и плавные переходы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: анимации и плавные переходы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: анимации и плавные переходы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: анимации и плавные переходы решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "middle-react-accessibility",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Middle: доступность React-приложений.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Middle: доступность React-приложений.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Middle: доступность React-приложений.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Middle: доступность React-приложений решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-node-streams",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: проектирование потоков в Node.js.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: проектирование потоков в Node.js.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: проектирование потоков в Node.js.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: проектирование потоков в Node.js решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-system-design-caching",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: мультиуровневый кэш.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: мультиуровневый кэш.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: мультиуровневый кэш.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: мультиуровневый кэш решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-security-auth",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: многоуровневая аутентификация.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: многоуровневая аутентификация.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: многоуровневая аутентификация.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: многоуровневая аутентификация решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "junior-algorithms-basics",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Junior: базовые алгоритмы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Junior: базовые алгоритмы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Junior: базовые алгоритмы.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Junior: базовые алгоритмы решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-distributed-consensus",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: консенсус и CAP.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: консенсус и CAP.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: консенсус и CAP.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: консенсус и CAP решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "junior-sql-optimization",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Junior: первые шаги в оптимизации SQL.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Junior: первые шаги в оптимизации SQL.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Junior: первые шаги в оптимизации SQL.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Junior: первые шаги в оптимизации SQL решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-api-versioning",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: стратегии версионирования API.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: стратегии версионирования API.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: стратегии версионирования API.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: стратегии версионирования API решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "junior-testing-strategy",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Junior: как выбрать стратегию тестирования.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Junior: как выбрать стратегию тестирования.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Junior: как выбрать стратегию тестирования.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Junior: как выбрать стратегию тестирования решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-performance-budget",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: управление performance budget.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: управление performance budget.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: управление performance budget.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: управление performance budget решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionSlug": "senior-edge-computing",
+    "answers": [
+      {
+        "text": "Правильное объяснение: Senior: когда нужен edge computing.",
+        "isCorrect": true
+      },
+      {
+        "text": "Практический сценарий применения: Senior: когда нужен edge computing.",
+        "isCorrect": true
+      },
+      {
+        "text": "Дополнительная деталь, уточняющая тему: Senior: когда нужен edge computing.",
+        "isCorrect": true
+      },
+      {
+        "text": "Распространённое заблуждение: Senior: когда нужен edge computing решает все проблемы автоматически.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

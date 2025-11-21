@@ -1,0 +1,44 @@
+# Dockerfile для статической генерации (SSG)
+# Использование: docker build -f Dockerfile.ssg -t ${APP_NAME:-test-platform}-ssg .
+
+# Базовый образ Bun
+FROM oven/bun:1 AS base
+WORKDIR /usr/src/app
+
+# Установка системных зависимостей для Prisma
+USER root
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# Установка зависимостей
+FROM base AS install
+COPY bun.lock package.json ./
+RUN bun install --frozen-lockfile
+
+# Генерация статического сайта
+FROM base AS generate
+COPY --from=install /usr/src/app/node_modules ./node_modules
+COPY . .
+# Генерируем Prisma Client
+RUN bunx prisma generate
+# Генерируем статический сайт
+RUN bun --bun run generate
+
+# Production образ с nginx для раздачи статики
+FROM nginx:alpine AS production
+WORKDIR /usr/share/nginx/html
+
+# Удаляем дефолтные файлы nginx
+RUN rm -rf ./*
+
+# Копируем сгенерированные статические файлы
+COPY --from=generate /usr/src/app/.output/public .
+
+# Копируем кастомную конфигурацию nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 3000
+CMD ["nginx", "-g", "daemon off;"]
+
+

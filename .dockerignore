@@ -1,0 +1,15 @@
+node_modules
+.nuxt
+.output
+.git
+.gitignore
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+.env
+.env.*
+dist
+coverage
+.vscode
+.idea
+docs/

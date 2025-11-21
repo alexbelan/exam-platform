@@ -1,0 +1,442 @@
+[
+  {
+    "slug": "middle-js-closures",
+    "title": "Middle: объясните замыкания в JavaScript",
+    "content": "Разберите механизм замыканий, правила поиска переменных и практические кейсы их использования в компонентах и сервисах.",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-event-loop",
+    "title": "Middle: цикл событий и баланс микрозадач",
+    "content": "Опишите очереди макро- и микрозадач, влияние await и Promise на порядок выполнения, а также способы профилирования.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-promises",
+    "title": "Middle: проектирование цепочек Promise",
+    "content": "Расскажите об обработке ошибок, гонках запросов и паттернах вроде Promise.allSettled в продакшн-коде.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-modules",
+    "title": "Middle: организация модулей ES и CommonJS",
+    "content": "Как комбинировать динамические импорты, tree-shaking и кэширование модулей для крупных фронтенд-проектов?",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-error-handling",
+    "title": "Middle: обработка ошибок в JavaScript",
+    "content": "Опишите централизованный перехват ошибок, нотификации и стратегии ретраев на клиенте.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-iterators",
+    "title": "Middle: генераторы и итераторы",
+    "content": "Расскажите, как построить ленивые вычисления, создавать пользовательские итераторы и интегрировать их с async-генераторами.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-performance",
+    "title": "Middle: оптимизация производительности JS",
+    "content": "Какие метрики отслеживать, как сокращать reflow и какие приёмы помогают держать TBT в пределах бюджета?",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-types",
+    "title": "Middle: статическая типизация поверх JavaScript",
+    "content": "Сравните JSDoc, TypeScript и другие решения для типизации динамического кода, приведите практические советы миграции.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-dom-optimizations",
+    "title": "Middle: работа с DOM без лишних перерисовок",
+    "content": "Опишите батчинг операций, MutationObserver и способы синхронизации с requestAnimationFrame.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-patterns",
+    "title": "Middle: архитектурные паттерны на чистом JS",
+    "content": "Когда стоит применять Module, Observer, Mediator и как сочетать их с современными фреймворками?",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-functional",
+    "title": "Middle: функциональные приёмы в JS",
+    "content": "Разберите каррирование, композицию, иммутабельность и способы избежать лишних аллокаций.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-testing",
+    "title": "Middle: стратегия тестирования JavaScript-кода",
+    "content": "Как распределять юнит, интеграционные и контрактные тесты для SDK и UI-библиотек?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-bundling",
+    "title": "Middle: настройка сборки и бандлеров",
+    "content": "Сравните Vite, Webpack и esbuild, объясните подход к код-сплиттингу и lazy-loading модулей.",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-security",
+    "title": "Middle: безопасность SPA",
+    "content": "Как предотвращать XSS, ограничивать eval и работать с Trusted Types в приложениях без фреймворков?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-js-tooling",
+    "title": "Middle: автоматизация и линтинг",
+    "content": "Опишите конвейер линтеров, форматтеров и проверок типов в моно-репозитории с десятками пакетов.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "javascript",
+      "middle"
+    ]
+  },
+  {
+    "slug": "middle-react-hooks",
+    "title": "Middle: продвинутые хуки в React",
+    "content": "Когда писать кастомные хуки, как мемоизировать вычисления и избегать бесконечных эффектов?",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-state",
+    "title": "Middle: выбор стейт-менеджера",
+    "content": "Сравните Context, Redux Toolkit, Zustand и другие решения для средних команд.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-context",
+    "title": "Middle: оптимизация Context API",
+    "content": "Как разбивать провайдеры, снижать количество рендеров и тестировать контекст?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-performance",
+    "title": "Middle: производительность React-компонентов",
+    "content": "Расскажите про memo, useTransition, профилирование и ограничения concurrent rendering.",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-suspense",
+    "title": "Middle: применение Suspense",
+    "content": "Какие паттерны загрузки данных поддерживает Suspense и как комбинировать его с React Query?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-forms",
+    "title": "Middle: сложные формы",
+    "content": "Опишите валидацию, управление черновиками и оптимизацию controlled-компонентов.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-routing",
+    "title": "Middle: архитектура маршрутизации",
+    "content": "Как проектировать nested routes, data loaders и переходы в SPA/MPA гибриде?",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-server-components",
+    "title": "Middle: React Server Components",
+    "content": "Когда оправдан RSC, как работать с кэшем данных и boundary между клиентом и сервером?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-testing",
+    "title": "Middle: тестирование React UI",
+    "content": "Сравните RTL, Cypress Component Testing и подходы к мокам сервисов.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-error-boundaries",
+    "title": "Middle: error boundary как часть UX",
+    "content": "Опишите стратегию fallback UI, логирование и интеграцию с Observability стеком.",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-concurrency",
+    "title": "Middle: concurrent возможности",
+    "content": "Расскажите о useTransition, useDeferredValue и управлении пользовательским опытом при тяжёлых рендерах.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-architecture",
+    "title": "Middle: архитектура модульного React",
+    "content": "Как организовать независимые фичи, code splitting и контрактные тесты между ними?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-patterns",
+    "title": "Middle: композиционные паттерны",
+    "content": "Сравните render props, compound components и контролируемые компоненты.",
+    "categorySlug": "frontend",
+    "isPublished": false,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-animations",
+    "title": "Middle: анимации и плавные переходы",
+    "content": "Какие библиотеки подходят для микровзаимодействий и как не перегружать main thread?",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "middle-react-accessibility",
+    "title": "Middle: доступность React-приложений",
+    "content": "Расскажите про aria-паттерны, управление фокусом и тестовые сценарии для assistive технологий.",
+    "categorySlug": "frontend",
+    "isPublished": true,
+    "tagSlugs": [
+      "middle",
+      "react"
+    ]
+  },
+  {
+    "slug": "senior-node-streams",
+    "title": "Senior: проектирование потоков в Node.js",
+    "content": "Как строить пайплайны, управлять backpressure и организовывать мониторинг?",
+    "categorySlug": "backend",
+    "tagSlugs": [
+      "nodejs",
+      "senior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "senior-system-design-caching",
+    "title": "Senior: мультиуровневый кэш",
+    "content": "Разберите write-through, near-cache и стратегии невалидирования в распределённых системах.",
+    "categorySlug": "backend",
+    "tagSlugs": [
+      "system-design",
+      "senior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "senior-security-auth",
+    "title": "Senior: многоуровневая аутентификация",
+    "content": "Опишите MFA, device binding и хранение секретов в enterprise-продуктах.",
+    "categorySlug": "backend",
+    "tagSlugs": [
+      "security",
+      "senior"
+    ],
+    "isPublished": false
+  },
+  {
+    "slug": "junior-algorithms-basics",
+    "title": "Junior: базовые алгоритмы",
+    "content": "Как объяснить сложность сортировок и работу хеш-таблиц на собеседовании?",
+    "categorySlug": "theory",
+    "tagSlugs": [
+      "algorithms",
+      "junior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "senior-distributed-consensus",
+    "title": "Senior: консенсус и CAP",
+    "content": "Сравните Paxos и Raft, расскажите про компромиссы доступности и согласованности.",
+    "categorySlug": "theory",
+    "tagSlugs": [
+      "distributed-systems",
+      "senior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "junior-sql-optimization",
+    "title": "Junior: первые шаги в оптимизации SQL",
+    "content": "Какие индексы создать, как читать планы выполнения и избегать seq scan?",
+    "categorySlug": "backend",
+    "tagSlugs": [
+      "postgresql",
+      "junior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "senior-api-versioning",
+    "title": "Senior: стратегии версионирования API",
+    "content": "Сравните URL, header и content negotiation подходы, расскажите про миграции клиентов.",
+    "categorySlug": "backend",
+    "tagSlugs": [
+      "rest",
+      "senior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "junior-testing-strategy",
+    "title": "Junior: как выбрать стратегию тестирования",
+    "content": "Какие уровни тестов must-have, как писать первые e2e и на что смотреть в отчётах?",
+    "categorySlug": "theory",
+    "tagSlugs": [
+      "testing",
+      "junior"
+    ],
+    "isPublished": false
+  },
+  {
+    "slug": "senior-performance-budget",
+    "title": "Senior: управление performance budget",
+    "content": "Опишите процесс утверждения бюджетов, метрики и автоматические гейты в CI.",
+    "categorySlug": "frontend",
+    "tagSlugs": [
+      "performance",
+      "senior"
+    ],
+    "isPublished": true
+  },
+  {
+    "slug": "senior-edge-computing",
+    "title": "Senior: когда нужен edge computing",
+    "content": "Расскажите о требованиях к безопасности, конфигурации и observability на краю сети.",
+    "categorySlug": "backend",
+    "tagSlugs": [
+      "system-design",
+      "senior"
+    ],
+    "isPublished": true
+  }
+]

@@ -1,0 +1,53 @@
+# Имя проекта берется из переменной окружения COMPOSE_PROJECT_NAME
+# Устанавливается автоматически через Makefile на основе APP_NAME из .env
+# По умолчанию: test-platform
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./server:/usr/src/app/server
+      - ./prisma:/usr/src/app/prisma
+      - ./public:/usr/src/app/public
+      - ./types:/usr/src/app/types
+      - ./nuxt.config.ts:/usr/src/app/nuxt.config.ts
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+      - ./bun.lock:/usr/src/app/bun.lock
+      - ./package.json:/usr/src/app/package.json
+      - ./eslint.config.mjs:/usr/src/app/eslint.config.mjs
+      - ./.env:/usr/src/app/.env
+      - node_modules:/usr/src/app/node_modules
+      - ./.nuxt:/usr/src/app/.nuxt
+      - ./.output:/usr/src/app/.output
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  node_modules:
