@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
       title,
       content,
       isPublished = false,
+      requiresPremium = false,
       categoryId = "",
       tags = [],
     } = body;
@@ -63,6 +64,7 @@ export default defineEventHandler(async (event) => {
         title,
         content,
         isPublished: Boolean(isPublished),
+        requiresPremium: Boolean(requiresPremium),
         categoryId: categoryId || "",
         tags: {
           connect: validTagIds.map((tagId) => ({ id: tagId })),

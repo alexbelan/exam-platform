@@ -1,5 +1,7 @@
 import { createError } from "h3";
 import { prisma } from "../../utils/prisma";
+import { getCurrentUser } from "../../utils/getUser";
+import { hasPremiumAccess } from "../../utils/subscription";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -13,6 +15,11 @@ export default defineEventHandler(async (event) => {
       status,
       tags,
     } = query;
+
+    // Получаем текущего пользователя
+    const user = await getCurrentUser(event);
+    const isAdmin = user?.role === "ADMIN";
+    const isPremium = user ? hasPremiumAccess(user) : false;
 
     // Построение фильтров
     const where: any = {};
@@ -48,8 +55,24 @@ export default defineEventHandler(async (event) => {
       where.type = type;
     }
 
+    // Фильтр по публикации с проверкой прав
     if (status !== undefined) {
-      where.isPublished = status === "true";
+      const statusValue = status === "true";
+      // Только админы могут запрашивать неопубликованные
+      if (statusValue === false && !isAdmin) {
+        // Для не-админов игнорируем false и показываем только опубликованные
+        where.isPublished = true;
+      } else {
+        where.isPublished = statusValue;
+      }
+    } else {
+      // По умолчанию показываем только опубликованные
+      where.isPublished = true;
+    }
+
+    // Фильтр по премиум доступу
+    if (!isPremium) {
+      where.requiresPremium = false;
     }
 
     // Получение вопросов с пагинацией
@@ -63,6 +86,7 @@ export default defineEventHandler(async (event) => {
           id: true,
           title: true,
           isPublished: true,
+          requiresPremium: true,
           createdAt: true,
           updatedAt: true,
           tags: {

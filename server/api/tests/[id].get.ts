@@ -1,5 +1,6 @@
 import { prisma } from "../../utils/prisma";
 import { createError } from "h3";
+import { getCurrentUser } from "../../utils/getUser";
 
 const TAG_INCLUDE = {
   tags: {
@@ -35,6 +36,17 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 404,
         statusMessage: "Тест не найден",
+      });
+    }
+
+    // Проверка доступа: неопубликованные тесты доступны только админам
+    const user = await getCurrentUser(event);
+    const isAdmin = user?.role === "ADMIN";
+
+    if (!test.isPublished && !isAdmin) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Доступ запрещен",
       });
     }
 

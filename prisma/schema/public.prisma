@@ -33,6 +33,7 @@ model InterviewQuestion {
   title           String
   content         String
   isPublished     Boolean            @default(false)
+  requiresPremium Boolean            @default(false)
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   categoryId      Int
@@ -78,6 +79,7 @@ model Test {
   primaryTagId  Int?
   primaryTag    Tag?       @relation("PrimaryTag", fields: [primaryTagId], references: [id], onDelete: SetNull)
   isPublished   Boolean    @default(false)
+  requiresPremium Boolean  @default(false)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   favoriteTests UserFavoriteTest[]

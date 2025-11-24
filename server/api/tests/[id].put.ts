@@ -5,6 +5,7 @@ interface TestPayload {
   description?: string | null;
   questionCount?: number;
   isPublished?: boolean;
+  requiresPremium?: boolean;
   tags?: Array<number | { id: number }>;
   questionIds?: number[];
   primaryTag?: number | { id: number } | null;
@@ -78,6 +79,7 @@ export default defineEventHandler(async (event) => {
       description,
       questionCount,
       isPublished,
+      requiresPremium,
       tags,
       questionIds,
       primaryTag,
@@ -136,6 +138,16 @@ export default defineEventHandler(async (event) => {
         });
       }
       data.isPublished = isPublished;
+    }
+
+    if (requiresPremium !== undefined) {
+      if (typeof requiresPremium !== "boolean") {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Некорректное значение requiresPremium",
+        });
+      }
+      data.requiresPremium = requiresPremium;
     }
 
     let secondaryTagIds: number[] | undefined;

@@ -1,4 +1,6 @@
 import { prisma } from "../../utils/prisma";
+import { getCurrentUser } from "../../utils/getUser";
+import { hasPremiumAccess } from "../../utils/subscription";
 
 const TAG_INCLUDE = {
   tags: {
@@ -21,6 +23,11 @@ export default defineEventHandler(async (event) => {
     const search = (query.search as string) || "";
     const tags = query.tags as string | undefined;
     const isPublishedQuery = query.isPublished as string | undefined;
+
+    // Получаем текущего пользователя
+    const user = await getCurrentUser(event);
+    const isAdmin = user?.role === "ADMIN";
+    const isPremium = user ? hasPremiumAccess(user) : false;
 
     type FindManyArgs = NonNullable<Parameters<typeof prisma.test.findMany>[0]>;
     const where: NonNullable<FindManyArgs["where"]> = {};
@@ -49,11 +56,25 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Фильтр по публикации
+    // Фильтр по публикации с проверкой прав
     if (isPublishedQuery === "true") {
       where.isPublished = true;
     } else if (isPublishedQuery === "false") {
-      where.isPublished = false;
+      // Только админы могут запрашивать неопубликованные
+      if (isAdmin) {
+        where.isPublished = false;
+      } else {
+        // Для не-админов игнорируем false и показываем только опубликованные
+        where.isPublished = true;
+      }
+    } else {
+      // По умолчанию показываем только опубликованные
+      where.isPublished = true;
+    }
+
+    // Фильтр по премиум доступу
+    if (!isPremium) {
+      where.requiresPremium = false;
     }
 
     // Объединяем все условия через AND

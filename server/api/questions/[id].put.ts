@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   try {
     const questionId = getRouterParam(event, "id");
     const body = await readBody(event);
-    const { title, content, isPublished, categoryId, tags } = body;
+    const { title, content, isPublished, requiresPremium, categoryId, tags } = body;
 
     if (!questionId) {
       throw createError({
@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
     if (title !== undefined) updateData.title = title;
     if (content !== undefined) updateData.content = content;
     if (isPublished !== undefined) updateData.isPublished = isPublished;
+    if (requiresPremium !== undefined) updateData.requiresPremium = requiresPremium;
     if (categoryId !== undefined) updateData.categoryId = categoryId;
 
     // Обновление тегов

@@ -98,6 +98,10 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    // Telegram конфигурация (только на сервере)
+    telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
+    telegramChannelId: process.env.TELEGRAM_CHANNEL_ID,
+    telegramChannelUsername: process.env.TELEGRAM_CHANNEL_USERNAME,
     session: {
       password:
         process.env.NUXT_SESSION_PASSWORD ||
@@ -109,6 +113,8 @@ export default defineNuxtConfig({
         maxAge: 60 * 60 * 24 * 7, // 1 неделя
       },
     },
-    public: {},
+    public: {
+      // Публичные переменные (если нужны на клиенте)
+    },
   },
 });

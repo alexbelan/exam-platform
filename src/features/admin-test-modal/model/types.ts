@@ -20,6 +20,7 @@ export interface AdminTestFormState {
   tags: AdminTestTagOption[];
   primaryTag: AdminTestTagOption | null;
   isPublished: boolean;
+  requiresPremium: boolean;
 }
 
 export interface AdminTestModalSubmitPayload {
@@ -31,6 +32,7 @@ export interface AdminTestModalSubmitPayload {
   tagIds: number[];
   primaryTagId: number | null;
   isPublished: boolean;
+  requiresPremium: boolean;
 }
 
 export interface AdminTestModalProps {

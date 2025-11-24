@@ -1,0 +1,38 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-page__content {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.profile-page__filter {
+  position: sticky;
+  top: 6rem;
+}
+
+.profile-page__content-area {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .profile-page__content {
+    grid-template-columns: 1fr 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-page__content {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page__filter {
+    position: static;
+  }
+}
+

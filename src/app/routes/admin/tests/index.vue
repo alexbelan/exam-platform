@@ -122,6 +122,7 @@ interface Test {
   questionCount: number;
   questionIds: number[];
   isPublished: boolean;
+  requiresPremium?: boolean;
   createdAt: string;
   updatedAt: string;
   tags: AdminTestTagOption[];
@@ -244,6 +245,7 @@ const createModalDefaults = (): AdminTestFormState => ({
   tags: [],
   primaryTag: null,
   isPublished: false,
+  requiresPremium: false,
 });
 
 const mapTestToForm = (test: Test): AdminTestFormState => ({
@@ -257,6 +259,7 @@ const mapTestToForm = (test: Test): AdminTestFormState => ({
   tags: test.tags ? [...test.tags] : [],
   primaryTag: test.primaryTag ?? null,
   isPublished: Boolean(test.isPublished),
+  requiresPremium: Boolean(test.requiresPremium ?? false),
 });
 
 const openCreateModal = () => {
@@ -285,6 +288,7 @@ const handleModalSubmit = async (payload: AdminTestModalSubmitPayload) => {
       tags: payload.tagIds,
       primaryTag: payload.primaryTagId,
       isPublished: payload.isPublished,
+      requiresPremium: payload.requiresPremium,
     };
 
     if (payload.id) {

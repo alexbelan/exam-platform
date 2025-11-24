@@ -70,6 +70,8 @@
 
       <FormCheckbox v-model="form.isPublished" label="Опубликован" binary />
 
+      <FormCheckbox v-model="form.requiresPremium" label="Требуется премиум подписка" binary />
+
       <div class="admin-test-modal__footer">
         <Button
           label="Отмена"

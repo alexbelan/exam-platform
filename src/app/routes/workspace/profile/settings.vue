@@ -1,5 +1,14 @@
 <template>
   <div class="workspace-settings">
+    <div class="workspace-settings__header">
+      <Button
+        label="Назад"
+        icon="pi pi-arrow-left"
+        text
+        severity="secondary"
+        @click="goBack"
+      />
+    </div>
     <Card class="settings-card">
       <template #title>Профиль</template>
       <template #content>
@@ -7,11 +16,19 @@
           <div class="form-grid">
             <div class="form-field">
               <label for="firstName">Имя</label>
-              <InputText id="firstName" v-model="form.firstName" placeholder="Ваше имя" />
+              <InputText
+                id="firstName"
+                v-model="form.firstName"
+                placeholder="Ваше имя"
+              />
             </div>
             <div class="form-field">
               <label for="lastName">Фамилия</label>
-              <InputText id="lastName" v-model="form.lastName" placeholder="Ваша фамилия" />
+              <InputText
+                id="lastName"
+                v-model="form.lastName"
+                placeholder="Ваша фамилия"
+              />
             </div>
             <div class="form-field">
               <label for="email">Email</label>
@@ -19,7 +36,11 @@
             </div>
             <div class="form-field">
               <label for="position">Должность / роль</label>
-              <InputText id="position" v-model="form.position" placeholder="Например, Frontend developer" />
+              <InputText
+                id="position"
+                v-model="form.position"
+                placeholder="Например, Frontend developer"
+              />
             </div>
           </div>
 
@@ -55,7 +76,11 @@
           </div>
 
           <div class="form-actions">
-            <Button label="Сохранить изменения" icon="pi pi-save" :loading="saving" />
+            <Button
+              label="Сохранить изменения"
+              icon="pi pi-save"
+              :loading="saving"
+            />
             <Button
               type="button"
               label="Отменить"
@@ -134,12 +159,22 @@ const saveProfile = async () => {
 const resetForm = () => {
   Object.assign(form, initialData.value);
 };
+
+const goBack = () => {
+  navigateTo("/workspace/profile");
+};
 </script>
 
 <style scoped>
 .workspace-settings {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.workspace-settings__header {
+  display: flex;
+  align-items: center;
 }
 
 .settings-card {
@@ -224,4 +259,3 @@ const resetForm = () => {
   }
 }
 </style>
-

@@ -1,5 +1,6 @@
 import { createError } from "h3";
 import { prisma } from "../../utils/prisma";
+import { getCurrentUser } from "../../utils/getUser";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -47,6 +48,17 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 404,
         statusMessage: "Вопрос не найден",
+      });
+    }
+
+    // Проверка доступа: неопубликованные вопросы доступны только админам
+    const user = await getCurrentUser(event);
+    const isAdmin = user?.role === "ADMIN";
+
+    if (!question.isPublished && !isAdmin) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Доступ запрещен",
       });
     }
 

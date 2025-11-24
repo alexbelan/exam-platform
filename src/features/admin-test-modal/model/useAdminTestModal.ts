@@ -15,6 +15,7 @@ const createDefaultForm = (): AdminTestFormState => ({
   tags: [],
   primaryTag: null,
   isPublished: false,
+  requiresPremium: false,
 });
 
 export function useAdminTestModal(
@@ -53,6 +54,7 @@ export function useAdminTestModal(
     form.tags = value.tags ? [...value.tags] : [];
     form.primaryTag = value.primaryTag ?? null;
     form.isPublished = value.isPublished ?? false;
+    form.requiresPremium = value.requiresPremium ?? false;
   };
 
   const initializeForm = (value: AdminTestFormState | null) => {
@@ -137,6 +139,7 @@ export function useAdminTestModal(
       tagIds: form.tags.map((tag) => tag.id),
       primaryTagId: form.primaryTag?.id ?? null,
       isPublished: form.isPublished,
+      requiresPremium: form.requiresPremium,
     };
 
     emit("submit", payload);

@@ -60,6 +60,11 @@
           label="Опубликовать вопрос"
         />
 
+        <FormCheckbox
+          v-model="questionForm.requiresPremium"
+          label="Требуется премиум подписка"
+        />
+
         <div class="answers-section">
           <h3>Ответы</h3>
 
@@ -200,6 +205,7 @@ interface Question {
   title: string;
   content: string;
   isPublished: boolean;
+  requiresPremium?: boolean;
   createdAt: string;
   updatedAt: string;
   categoryId: number | null;
@@ -226,6 +232,7 @@ const questionForm = ref({
   title: "",
   content: "",
   isPublished: false,
+  requiresPremium: false,
   categoryId: null as number | null,
 });
 
@@ -280,6 +287,7 @@ const fetchQuestion = async () => {
       title: question.value.title,
       content: question.value.content,
       isPublished: question.value.isPublished,
+      requiresPremium: question.value.requiresPremium ?? false,
       categoryId: question.value.categoryId ?? null,
     };
     selectedTags.value = question.value.tags || [];

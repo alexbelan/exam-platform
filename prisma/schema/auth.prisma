@@ -4,8 +4,13 @@
 
 model User {
   id                 Int              @id @default(autoincrement())
-  email              String           @unique
-  password           String
+  // Telegram авторизация (для обычных пользователей)
+  telegramId         BigInt?          @unique
+  telegramUsername   String?
+  // Email авторизация (для админов)
+  email              String?          @unique
+  password           String?
+  // Общие поля
   firstName          String?
   lastName           String?
   role               UserRole         @default(USER)
