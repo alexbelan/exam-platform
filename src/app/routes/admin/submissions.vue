@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminSubmissionsPage } from "@pages/admin/submissions";
+import { AdminSubmissionsPage } from "@pages/admin-submissions";
 
 definePageMeta({
   middleware: "admin",

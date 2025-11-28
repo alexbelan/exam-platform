@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminTagCategoriesPage } from "@pages/admin/tag-categories";
+import { AdminTagCategoriesPage } from "@pages/admin-categories";
 
 definePageMeta({
   middleware: "admin",

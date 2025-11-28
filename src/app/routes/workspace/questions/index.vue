@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { WorkspaceQuestionsPage } from "@pages/workspace/questions/index";
+import { WorkspaceQuestionsPage } from "@pages/workspace-questions";
 
 definePageMeta({
   layout: "workspace",

@@ -1,6 +1,6 @@
-import type { AdminQuestionsFilters } from "@features/admin-questions-filters";
+import type { QuestionsFilters } from "@features/questions-filters";
 
-export interface AdminQuestionsCatalogFilters extends AdminQuestionsFilters {
+export interface AdminQuestionsCatalogFilters extends QuestionsFilters {
   page: number;
   limit: number;
 }

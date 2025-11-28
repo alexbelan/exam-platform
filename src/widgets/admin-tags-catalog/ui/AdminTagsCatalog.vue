@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <AdminTagsFilters
+    <TagsFilters
       :model-value="{ search: filters.search, categoryId: filters.categoryId }"
       :categories="categories"
       :categories-loading="categoriesLoading"
@@ -26,7 +26,7 @@
       @reset="handleFiltersReset"
     />
 
-    <AdminTagsTable
+    <TagsTable
       :tags="tags"
       :pagination="pagination"
       :loading="loading"
@@ -39,10 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { AdminTagsFilters } from "@features/admin-tags-filters";
-import { AdminTagsTable } from "@features/admin-tags-table";
+import { TagsFilters } from "@features/tags-filters";
+import { TagsTable } from "@features/tags-table";
 import { useAdminTagsCatalog } from "../model/useAdminTagsCatalog";
-import type { Tag } from "@features/admin-tags-table";
+import type { Tag } from "@features/tags-table";
 
 const emit = defineEmits<{
   (event: "create"): void;

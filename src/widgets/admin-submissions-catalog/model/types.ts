@@ -1,5 +1,5 @@
-import type { AdminSubmissionsFilters } from "@features/admin-submissions-filters";
-import type { Submission } from "@features/admin-submissions-table";
+import type { SubmissionsFilters } from "@features/submissions-filters";
+import type { Submission } from "@features/submissions-table";
 
-export interface AdminSubmissionsCatalogFilters extends AdminSubmissionsFilters {}
+export interface AdminSubmissionsCatalogFilters extends SubmissionsFilters {}
 

@@ -1,6 +1,6 @@
-import type { AdminTagsFilters } from "@features/admin-tags-filters";
+import type { TagsFilters } from "@features/tags-filters";
 
-export interface AdminTagsCatalogFilters extends AdminTagsFilters {
+export interface AdminTagsCatalogFilters extends TagsFilters {
   page: number;
   limit: number;
 }

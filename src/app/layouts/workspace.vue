@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkspaceNavigationMenu } from "@features/workspace-navigation-menu";
+import { WorkspaceNavigationMenu } from "@features/workspace-navigation";
 import { AuthButton } from "@features/auth-button";
 import { Header } from "@shared/ui";
 

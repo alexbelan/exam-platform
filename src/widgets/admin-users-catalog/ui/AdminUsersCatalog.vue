@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <AdminUsersFilters
+    <UsersFilters
       :model-value="{
         search: filters.search,
         role: filters.role,
@@ -28,7 +28,7 @@
       @reset="handleFiltersReset"
     />
 
-    <AdminUsersTable
+    <UsersTable
       :users="users"
       :pagination="pagination"
       :loading="loading"
@@ -42,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
-import { AdminUsersFilters } from "@features/admin-users-filters";
-import { AdminUsersTable } from "@features/admin-users-table";
+import { UsersFilters } from "@features/users-filters";
+import { UsersTable } from "@features/users-table";
 import { useAdminUsersCatalog } from "../model/useAdminUsersCatalog";
-import type { User } from "@features/admin-users-table";
+import type { User } from "@features/users-table";
 
 const emit = defineEmits<{
   (event: "create"): void;

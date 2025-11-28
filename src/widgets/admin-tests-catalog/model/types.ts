@@ -1,6 +1,6 @@
-import type { AdminTestsFilters } from "@features/admin-tests-filters";
+import type { TestsFilters } from "@features/tests-filters";
 
-export interface AdminTestsCatalogFilters extends AdminTestsFilters {
+export interface AdminTestsCatalogFilters extends TestsFilters {
   page: number;
   limit: number;
 }

@@ -13,9 +13,9 @@
       </div>
     </div>
 
-    <AdminTagCategoriesCreateForm @submit="handleCreate" />
+    <CategoryForm @submit="handleCreate" />
 
-    <AdminTagCategoriesTable
+    <CategoriesTable
       :categories="categories"
       :pagination="pagination"
       :loading="loading"
@@ -28,10 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import { AdminTagCategoriesCreateForm } from "@features/admin-tag-categories-create-form";
-import { AdminTagCategoriesTable } from "@features/admin-tag-categories-table";
+import { CategoryForm } from "@features/category-form";
+import { CategoriesTable } from "@features/categories-table";
 import { useAdminTagCategoriesCatalog } from "../model/useAdminTagCategoriesCatalog";
-import type { CategoryTableItem } from "@features/admin-tag-categories-table";
+import type { CategoryTableItem } from "@features/categories-table";
 
 const emit = defineEmits<{
   (event: "create", data: { name: string; color: string }): void;

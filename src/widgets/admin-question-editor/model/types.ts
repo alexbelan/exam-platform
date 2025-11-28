@@ -1,5 +1,5 @@
-import type { QuestionFormData, Tag } from "@features/admin-question-form";
-import type { QuestionAnswer } from "@features/admin-question-answers";
+import type { QuestionFormData, Tag } from "@features/question-form";
+import type { QuestionAnswer } from "@features/question-answers";
 
 export interface Question {
   id: number;

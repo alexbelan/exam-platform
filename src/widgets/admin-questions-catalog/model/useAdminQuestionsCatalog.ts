@@ -1,9 +1,9 @@
 import { computed, ref, watch } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
-import { useAdminQuestionsTable } from "@features/admin-questions-table/model/useAdminQuestionsTable";
+import { useQuestionsTable } from "@features/questions-table/model/useQuestionsTable";
 import type { AdminQuestionsCatalogFilters } from "./types";
-import type { Question, AdminQuestionsTableFilters } from "@features/admin-questions-table";
+import type { Question, QuestionsTableFilters } from "@features/questions-table";
 
 export function useAdminQuestionsCatalog(
   emit: {
@@ -22,7 +22,7 @@ export function useAdminQuestionsCatalog(
     limit: 10,
   });
 
-  const tableFilters = computed<AdminQuestionsTableFilters>(() => ({
+  const tableFilters = computed<QuestionsTableFilters>(() => ({
     search: filters.value.search,
     status: filters.value.status,
     page: filters.value.page,
@@ -38,7 +38,7 @@ export function useAdminQuestionsCatalog(
     handlePageChange: handleTablePageChange,
     refresh,
     cacheKey,
-  } = useAdminQuestionsTable(tableFilters, (event: { page: number; rows: number }) => {
+  } = useQuestionsTable(tableFilters, (event: { page: number; rows: number }) => {
     filters.value.page = event.page + 1;
     filters.value.limit = event.rows;
   });

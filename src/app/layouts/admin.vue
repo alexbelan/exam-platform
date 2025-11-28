@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { AdminNavigationMenu } from "@features/admin-navigation-menu";
+import { AdminNavigationMenu } from "@features/admin-navigation";
 import { AuthButton } from "@features/auth-button";
 import { Header } from "@shared/ui";
 

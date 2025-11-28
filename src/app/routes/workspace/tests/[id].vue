@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { WorkspaceTestPage } from "@pages/workspace/tests/[id]";
+import { WorkspaceTestPage } from "@pages/workspace-test-detail";
 
 definePageMeta({
   layout: "workspace",

@@ -1,6 +1,6 @@
-import type { AdminUsersFilters } from "@features/admin-users-filters";
+import type { UsersFilters } from "@features/users-filters";
 
-export interface AdminUsersCatalogFilters extends AdminUsersFilters {
+export interface AdminUsersCatalogFilters extends UsersFilters {
   page: number;
   limit: number;
 }

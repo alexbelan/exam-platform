@@ -9,13 +9,13 @@
       />
     </div>
 
-    <AdminTestsFilters
+    <TestsFilters
       :model-value="{ search: filters.search }"
       @update:model-value="handleFiltersUpdate"
       @reset="handleFiltersReset"
     />
 
-    <AdminTestsTable
+    <TestsTable
       :tests="tests"
       :pagination="pagination"
       :loading="loading"
@@ -28,10 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import { AdminTestsFilters } from "@features/admin-tests-filters";
-import { AdminTestsTable } from "@features/admin-tests-table";
+import { TestsFilters } from "@features/tests-filters";
+import { TestsTable } from "@features/tests-table";
 import { useAdminTestsCatalog } from "../model/useAdminTestsCatalog";
-import type { Test } from "@features/admin-tests-table";
+import type { Test } from "@features/tests-table";
 
 const emit = defineEmits<{
   (event: "create"): void;

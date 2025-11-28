@@ -1,10 +1,10 @@
 import { computed, ref, onMounted } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
-import { useAdminTestsTable } from "@features/admin-tests-table/model/useAdminTestsTable";
+import { useTestsTable } from "@features/tests-table/model/useTestsTable";
 import type { AdminTestsCatalogFilters } from "./types";
-import type { Test, AdminTestsTableFilters } from "@features/admin-tests-table";
-import type { AdminTestTagOption } from "@features/admin-test-modal";
+import type { Test, TestsTableFilters } from "@features/tests-table";
+import type { TestTagOption } from "@features/test-modal";
 
 export function useAdminTestsCatalog(
   emit: {
@@ -20,10 +20,10 @@ export function useAdminTestsCatalog(
     limit: 10,
   });
 
-  const tagOptions = ref<AdminTestTagOption[]>([]);
+  const tagOptions = ref<TestTagOption[]>([]);
   const tagsLoading = ref(false);
 
-  const tableFilters = computed<AdminTestsTableFilters>(() => ({
+  const tableFilters = computed<TestsTableFilters>(() => ({
     search: filters.value.search,
     page: filters.value.page,
     limit: filters.value.limit,
@@ -37,7 +37,7 @@ export function useAdminTestsCatalog(
     handlePageChange: handleTablePageChange,
     refresh,
     cacheKey,
-  } = useAdminTestsTable(tableFilters, (event: { page: number; rows: number }) => {
+  } = useTestsTable(tableFilters, (event: { page: number; rows: number }) => {
     filters.value.page = event.page + 1;
     filters.value.limit = event.rows;
   });
@@ -49,7 +49,7 @@ export function useAdminTestsCatalog(
         page: 1,
         limit: 100, // Загружаем все теги для выбора
       });
-      tagOptions.value = response.tags as AdminTestTagOption[];
+      tagOptions.value = response.tags as TestTagOption[];
     } catch (error) {
       console.error("Ошибка при загрузке тегов:", error);
       toast.add({

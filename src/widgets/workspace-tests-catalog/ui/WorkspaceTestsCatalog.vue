@@ -15,7 +15,7 @@
     </ActionsHeader>
 
     <div class="workspace-tests-catalog__content-grid">
-      <WorkspaceTestDisplay
+      <TestsDisplay
         :filters="() => filters"
         @start-test="handleStartTest"
       />
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkspaceTestDisplay } from "@features/workspace-test-display";
+import { TestsDisplay } from "@features/tests-display";
 import { TagFilter } from "@features/tag-filter";
 import { ActionsHeader } from "@entities/action-header";
 import { useWorkspaceTestsCatalog } from "../model/useWorkspaceTestsCatalog";

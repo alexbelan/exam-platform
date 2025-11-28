@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminTestsPage } from "@pages/admin/tests";
+import { AdminTestsPage } from "@pages/admin-tests";
 
 definePageMeta({
   middleware: "admin",

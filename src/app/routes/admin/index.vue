@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminDashboardPage } from "@pages/admin/index";
+import { AdminDashboardPage } from "@pages/admin-dashboard";
 
 definePageMeta({
   middleware: "admin",

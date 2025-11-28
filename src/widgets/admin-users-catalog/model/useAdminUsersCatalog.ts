@@ -1,9 +1,9 @@
 import { computed, ref } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
-import { useAdminUsersTable } from "@features/admin-users-table/model/useAdminUsersTable";
+import { useUsersTable } from "@features/users-table/model/useUsersTable";
 import type { AdminUsersCatalogFilters } from "./types";
-import type { User, AdminUsersTableFilters } from "@features/admin-users-table";
+import type { User, UsersTableFilters } from "@features/users-table";
 
 export function useAdminUsersCatalog(
   emit: {
@@ -20,7 +20,7 @@ export function useAdminUsersCatalog(
     limit: 10,
   });
 
-  const tableFilters = computed<AdminUsersTableFilters>(() => ({
+  const tableFilters = computed<UsersTableFilters>(() => ({
     search: filters.value.search,
     role: filters.value.role,
     status: filters.value.status,
@@ -35,7 +35,7 @@ export function useAdminUsersCatalog(
     loading,
     refresh,
     cacheKey,
-  } = useAdminUsersTable(tableFilters, (event: { page: number; rows: number }) => {
+  } = useUsersTable(tableFilters, (event: { page: number; rows: number }) => {
     filters.value.page = event.page + 1;
     filters.value.limit = event.rows;
   });

@@ -2,9 +2,9 @@ import { computed, ref } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
 import { useConfirm } from "primevue/useconfirm";
-import { useAdminTagCategoriesTable } from "@features/admin-tag-categories-table/model/useAdminTagCategoriesTable";
+import { useCategoriesTable } from "@features/categories-table/model/useCategoriesTable";
 import type { AdminTagCategoriesCatalogFilters } from "./types";
-import type { CategoryTableItem, AdminTagCategoriesTableFilters } from "@features/admin-tag-categories-table";
+import type { CategoryTableItem, CategoriesTableFilters } from "@features/categories-table";
 
 const extractErrorMessage = (error: any, fallback: string) =>
   error?.data?.statusMessage ||
@@ -27,7 +27,7 @@ export function useAdminTagCategoriesCatalog(
     limit: 10,
   });
 
-  const tableFilters = computed<AdminTagCategoriesTableFilters>(() => ({
+  const tableFilters = computed<CategoriesTableFilters>(() => ({
     page: filters.value.page,
     limit: filters.value.limit,
   }));
@@ -40,7 +40,7 @@ export function useAdminTagCategoriesCatalog(
     handlePageChange: handleTablePageChange,
     refresh,
     cacheKey,
-  } = useAdminTagCategoriesTable(tableFilters, (event: { page: number; rows: number }) => {
+  } = useCategoriesTable(tableFilters, (event: { page: number; rows: number }) => {
     filters.value.page = event.page + 1;
     filters.value.limit = event.rows;
   });

@@ -1,6 +1,6 @@
 import { ref, computed } from "vue";
 import type { AdminSubmissionsCatalogFilters } from "./types";
-import type { Submission } from "@features/admin-submissions-table";
+import type { Submission } from "@features/submissions-table";
 
 export function useAdminSubmissionsCatalog(
   emit: {

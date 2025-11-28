@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdminUsersPage } from "@pages/admin/users";
+import { AdminUsersPage } from "@pages/admin-users";
 
 definePageMeta({
   middleware: "admin",

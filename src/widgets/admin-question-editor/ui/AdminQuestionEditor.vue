@@ -32,14 +32,14 @@
 
     <div v-else class="question-form-container">
       <div class="form-card">
-        <AdminQuestionForm
+        <QuestionForm
           :model-value="questionForm"
           :selected-tags="selectedTags"
           @update:model-value="questionForm = $event"
           @update:selected-tags="selectedTags = $event"
         />
 
-        <AdminQuestionAnswers
+        <QuestionAnswers
           :answers="questionAnswers"
           @update:answers="questionAnswers = $event"
         />
@@ -60,8 +60,8 @@
 </template>
 
 <script setup lang="ts">
-import { AdminQuestionForm } from "@features/admin-question-form";
-import { AdminQuestionAnswers } from "@features/admin-question-answers";
+import { QuestionForm } from "@features/question-form";
+import { QuestionAnswers } from "@features/question-answers";
 import { useAdminQuestionEditor } from "../model/useAdminQuestionEditor";
 import type { AdminQuestionEditorProps, AdminQuestionEditorEmits } from "../model/types";
 

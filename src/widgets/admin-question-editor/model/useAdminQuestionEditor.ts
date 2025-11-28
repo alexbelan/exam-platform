@@ -1,8 +1,8 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
-import type { QuestionFormData, Tag } from "@features/admin-question-form";
-import type { QuestionAnswer } from "@features/admin-question-answers";
+import type { QuestionFormData, Tag } from "@features/question-form";
+import type { QuestionAnswer } from "@features/question-answers";
 import type { Question } from "./types";
 
 export const formatDate = (dateString: string) => {

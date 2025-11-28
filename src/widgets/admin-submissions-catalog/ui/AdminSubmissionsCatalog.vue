@@ -18,13 +18,13 @@
       </div>
     </div>
 
-    <AdminSubmissionsFilters
+    <SubmissionsFilters
       :model-value="filters"
       @update:model-value="handleFiltersUpdate"
       @reset="handleFiltersReset"
     />
 
-    <AdminSubmissionsTable
+    <SubmissionsTable
       :submissions="submissions"
       :loading="loading"
       :selected-submissions="selectedSubmissions"
@@ -39,10 +39,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { AdminSubmissionsFilters } from "@features/admin-submissions-filters";
-import { AdminSubmissionsTable } from "@features/admin-submissions-table";
+import { SubmissionsFilters } from "@features/submissions-filters";
+import { SubmissionsTable } from "@features/submissions-table";
 import { useAdminSubmissionsCatalog } from "../model/useAdminSubmissionsCatalog";
-import type { Submission } from "@features/admin-submissions-table";
+import type { Submission } from "@features/submissions-table";
 
 const emit = defineEmits<{
   (event: "view", submission: Submission): void;

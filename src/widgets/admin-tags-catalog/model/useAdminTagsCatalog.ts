@@ -2,9 +2,9 @@ import { computed, ref, onMounted, reactive } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
 import { useConfirm } from "primevue/useconfirm";
-import { useAdminTagsTable } from "@features/admin-tags-table/model/useAdminTagsTable";
+import { useTagsTable } from "@features/tags-table/model/useTagsTable";
 import type { AdminTagsCatalogFilters } from "./types";
-import type { Tag, AdminTagsTableFilters } from "@features/admin-tags-table";
+import type { Tag, TagsTableFilters } from "@features/tags-table";
 import type { CategoryEntity } from "@entities/category";
 
 const extractErrorMessage = (error: any, fallback: string) =>
@@ -31,7 +31,7 @@ export function useAdminTagsCatalog(
   const categories = ref<CategoryEntity[]>([]);
   const categoriesLoading = ref(false);
 
-  const tableFilters = computed<AdminTagsTableFilters>(() => ({
+  const tableFilters = computed<TagsTableFilters>(() => ({
     search: filters.value.search,
     categoryId: filters.value.categoryId,
     page: filters.value.page,
@@ -46,7 +46,7 @@ export function useAdminTagsCatalog(
     handlePageChange: handleTablePageChange,
     refresh,
     cacheKey,
-  } = useAdminTagsTable(tableFilters, (event: { page: number; rows: number }) => {
+  } = useTagsTable(tableFilters, (event: { page: number; rows: number }) => {
     filters.value.page = event.page + 1;
     filters.value.limit = event.rows;
   });

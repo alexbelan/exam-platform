@@ -15,7 +15,7 @@
     </ActionsHeader>
 
     <div class="workspace-questions-catalog__content-grid">
-      <WorkspaceQuestionsDisplay
+      <QuestionsDisplay
         :filters="filters"
         :bookmarks="bookmarks"
         @open="handleOpen"
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkspaceQuestionsDisplay } from "@features/workspace-questions-display";
+import { QuestionsDisplay } from "@features/questions-display";
 import { TagFilter } from "@features/tag-filter";
 import { ActionsHeader } from "@entities/action-header";
 import { useWorkspaceQuestionsCatalog } from "../model/useWorkspaceQuestionsCatalog";

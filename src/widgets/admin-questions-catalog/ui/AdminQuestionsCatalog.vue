@@ -17,13 +17,13 @@
       </div>
     </div>
 
-    <AdminQuestionsFilters
+    <QuestionsFilters
       :model-value="{ search: filters.search, status: filters.status }"
       @update:model-value="handleFiltersUpdate"
       @reset="handleFiltersReset"
     />
 
-    <AdminQuestionsTable
+    <QuestionsTable
       :questions="questions"
       :pagination="pagination"
       :loading="loading"
@@ -37,10 +37,10 @@
 </template>
 
 <script setup lang="ts">
-import { AdminQuestionsFilters } from "@features/admin-questions-filters";
-import { AdminQuestionsTable } from "@features/admin-questions-table";
+import { QuestionsFilters } from "@features/questions-filters";
+import { QuestionsTable } from "@features/questions-table";
 import { useAdminQuestionsCatalog } from "../model/useAdminQuestionsCatalog";
-import type { Question } from "@features/admin-questions-table";
+import type { Question } from "@features/questions-table";
 
 const emit = defineEmits<{
   (event: "open", id: number): void;
