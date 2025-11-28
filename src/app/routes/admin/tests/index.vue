@@ -98,10 +98,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { Table } from "@shared/ui";
 import { AdminTestModal } from "@features/admin-test-modal";
+import { trpc } from "#shared/lib/trpc";
 import type {
   AdminTestFormState,
   AdminTestModalSubmitPayload,
@@ -148,8 +149,6 @@ const columns: TableColumn<Test>[] = [
   },
 ];
 
-const tests = ref<Test[]>([]);
-const loading = ref(false);
 const searchQuery = ref("");
 const pagination = ref({
   page: 1,
@@ -165,27 +164,38 @@ const modalForm = ref<AdminTestFormState | null>(null);
 const tagOptions = ref<AdminTestTagOption[]>([]);
 const tagsLoading = ref(false);
 
-const fetchTests = async () => {
-  loading.value = true;
-  try {
-    const params = new URLSearchParams({
-      page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString(),
+// Параметры запроса для кеширования
+const queryParams = computed(() => ({
+  page: pagination.value.page,
+  limit: pagination.value.limit,
+  search: searchQuery.value.trim() || undefined,
+}));
+
+// Ключ кеша
+const cacheKey = computed(
+  () => `admin-tests-${JSON.stringify(queryParams.value)}`
+);
+
+// Кеширование через useAsyncData
+const {
+  data: testsData,
+  pending: loading,
+  error,
+  refresh: refreshTests,
+} = useAsyncData(
+  cacheKey,
+  async () => {
+    const response = await trpc.tests.getList.query({
+      page: queryParams.value.page,
+      limit: queryParams.value.limit,
+      search: queryParams.value.search,
+      isPublished: undefined, // В админке показываем все тесты
     });
 
-    if (searchQuery.value) {
-      params.append("search", searchQuery.value);
-    }
-
-    const response = await $fetch<{
-      tests: Test[];
-      pagination: typeof pagination.value;
-    }>(`/api/tests?${params}`);
-
-    tests.value = response.tests.map((test) => {
+    const processedTests = response.tests.map((test: Test) => {
       const primaryTag = test.primaryTag ?? null;
       const hasPrimaryInList = primaryTag
-        ? test.tags.some((tag) => tag.id === primaryTag.id)
+        ? test.tags.some((tag: AdminTestTagOption) => tag.id === primaryTag.id)
         : false;
       const mergedTags =
         primaryTag && !hasPrimaryInList
@@ -198,24 +208,63 @@ const fetchTests = async () => {
         tags: mergedTags,
       };
     });
-    pagination.value = response.pagination;
-  } catch (error) {
-    console.error("Ошибка при загрузке тестов:", error);
+
+    return {
+      tests: processedTests,
+      pagination: response.pagination,
+    };
+  },
+  {
+    immediate: true,
+    watch: [queryParams],
+    getCachedData: (key, nuxtApp) => {
+      const cached = nuxtApp.payload.data[key];
+      if (cached) {
+        return cached;
+      }
+      return undefined;
+    },
+  }
+);
+
+// Синхронизируем данные из кеша
+const tests = computed(() => testsData.value?.tests ?? []);
+watch(
+  testsData,
+  (newData) => {
+    if (newData) {
+      pagination.value = newData.pagination;
+    }
+  },
+  { immediate: true }
+);
+
+// Обработка ошибок
+watch(error, (err) => {
+  if (err) {
+    console.error("Ошибка при загрузке тестов:", err);
     toast.add({
       severity: "error",
       summary: "Ошибка",
       detail: "Не удалось загрузить тесты",
     });
-  } finally {
-    loading.value = false;
   }
+});
+
+const fetchTests = async () => {
+  // Очищаем кеш перед обновлением, чтобы гарантировать свежие данные
+  await clearNuxtData(cacheKey.value);
+  await refreshTests();
 };
 
 const fetchTags = async () => {
   tagsLoading.value = true;
   try {
-    const response = await $fetch<{ tags: AdminTestTagOption[] }>("/api/tags");
-    tagOptions.value = response.tags;
+    const response = await trpc.tags.getList.query({
+      page: 1,
+      limit: 100, // Загружаем все теги для выбора
+    });
+    tagOptions.value = response.tags as AdminTestTagOption[];
   } catch (error) {
     console.error("Ошибка при загрузке тегов:", error);
     toast.add({
@@ -292,9 +341,9 @@ const handleModalSubmit = async (payload: AdminTestModalSubmitPayload) => {
     };
 
     if (payload.id) {
-      await $fetch(`/api/tests/${payload.id}`, {
-        method: "PUT",
-        body,
+      await trpc.tests.update.mutate({
+        id: payload.id,
+        ...body,
       });
       toast.add({
         severity: "success",
@@ -302,10 +351,7 @@ const handleModalSubmit = async (payload: AdminTestModalSubmitPayload) => {
         detail: "Тест обновлён",
       });
     } else {
-      await $fetch(`/api/tests`, {
-        method: "POST",
-        body,
-      });
+      await trpc.tests.create.mutate(body);
       toast.add({
         severity: "success",
         summary: "Создано",
@@ -313,7 +359,9 @@ const handleModalSubmit = async (payload: AdminTestModalSubmitPayload) => {
       });
     }
 
-    await fetchTests();
+    // Очищаем кеш и обновляем данные после мутации
+    await clearNuxtData(cacheKey.value);
+    await refreshTests();
     modalVisible.value = false;
   } catch (error) {
     console.error("Ошибка при сохранении теста:", error);
@@ -333,9 +381,7 @@ const deleteTest = async (test: Test) => {
   }
 
   try {
-    await $fetch(`/api/tests/${test.id}`, {
-      method: "DELETE",
-    });
+    await trpc.tests.delete.mutate({ id: test.id });
 
     toast.add({
       severity: "success",
@@ -343,7 +389,9 @@ const deleteTest = async (test: Test) => {
       detail: "Тест удалён",
     });
 
-    await fetchTests();
+    // Очищаем кеш и обновляем данные после удаления
+    await clearNuxtData(cacheKey.value);
+    await refreshTests();
   } catch (error) {
     console.error("Ошибка при удалении теста:", error);
     toast.add({
@@ -357,14 +405,14 @@ const deleteTest = async (test: Test) => {
 const onPageChange = (event: PageEvent) => {
   pagination.value.page = event.page + 1;
   pagination.value.limit = event.rows;
-  fetchTests();
+  // Данные автоматически обновятся через watch [queryParams]
 };
 
 watch(
   () => searchQuery.value,
   () => {
     pagination.value.page = 1;
-    fetchTests();
+    // Данные автоматически обновятся через watch [queryParams]
   }
 );
 

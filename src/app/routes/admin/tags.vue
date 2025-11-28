@@ -119,6 +119,7 @@ import Dropdown from "primevue/dropdown";
 import Tag from "primevue/tag";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { Table } from "@shared/ui";
+import { trpc } from "#shared/lib/trpc";
 import type { TableColumn, PageEvent } from "@shared/ui/Table";
 import { useConfirm } from "primevue/useconfirm";
 import { TAG_CATEGORY_DEFAULT_COLOR } from "@features/admin-tag-category-modal/model/useAdminTagCategoryModal";
@@ -139,8 +140,6 @@ type Tag = TagEntity;
 
 const categories = ref<CategoryEntity[]>([]);
 const categoriesLoading = ref(false);
-const tags = ref<Tag[]>([]);
-const tagsLoading = ref(false);
 const rowsPerPageOptions = [10, 25, 50];
 const pagination = ref({
   page: 1,
@@ -151,6 +150,77 @@ const pagination = ref({
 
 const tagsSearch = ref("");
 const selectedCategoryFilter = ref<number | null>(null);
+
+// Параметры запроса для кеширования
+const queryParams = computed(() => ({
+  page: pagination.value.page,
+  limit: pagination.value.limit,
+  search: tagsSearch.value.trim() || undefined,
+  categoryId: selectedCategoryFilter.value !== null ? selectedCategoryFilter.value : undefined,
+}));
+
+// Ключ кеша
+const cacheKey = computed(
+  () => `admin-tags-${JSON.stringify(queryParams.value)}`
+);
+
+// Кеширование через useAsyncData
+const {
+  data: tagsData,
+  pending: tagsLoading,
+  error: tagsError,
+  refresh: refreshTags,
+} = useAsyncData(
+  cacheKey,
+  async () => {
+    const response = await trpc.tags.getList.query({
+      page: queryParams.value.page,
+      limit: queryParams.value.limit,
+      search: queryParams.value.search,
+      categoryId: queryParams.value.categoryId?.toString(),
+    });
+
+    return {
+      tags: response.tags as Tag[],
+      pagination: response.pagination,
+    };
+  },
+  {
+    immediate: true,
+    watch: [queryParams],
+    getCachedData: (key, nuxtApp) => {
+      const cached = nuxtApp.payload.data[key];
+      if (cached) {
+        return cached;
+      }
+      return undefined;
+    },
+  }
+);
+
+// Синхронизируем данные из кеша
+const tags = computed(() => tagsData.value?.tags ?? []);
+watch(
+  tagsData,
+  (newData) => {
+    if (newData) {
+      pagination.value = newData.pagination;
+    }
+  },
+  { immediate: true }
+);
+
+// Обработка ошибок
+watch(tagsError, (err) => {
+  if (err) {
+    console.error("Ошибка при загрузке тегов:", err);
+    toast.add({
+      severity: "error",
+      summary: "Ошибка",
+      detail: extractErrorMessage(err, "Не удалось загрузить теги"),
+    });
+  }
+});
 
 const tagModal = reactive({
   visible: false,
@@ -248,10 +318,11 @@ const extractErrorMessage = (error: any, fallback: string) =>
 const fetchCategories = async () => {
   categoriesLoading.value = true;
   try {
-    const response = await $fetch<{ categories: CategoryEntity[] }>(
-      "/api/tag-categories"
-    );
-    categories.value = response.categories;
+    const response = await trpc.tagCategories.getList.query({
+      page: 1,
+      limit: 100, // Загружаем все категории
+    });
+    categories.value = response.categories as CategoryEntity[];
     if (
       selectedCategoryFilter.value !== null &&
       !categories.value.some(
@@ -272,47 +343,13 @@ const fetchCategories = async () => {
   }
 };
 
-const fetchTags = async () => {
-  tagsLoading.value = true;
-  try {
-    const query: Record<string, string> = {
-      page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString(),
-    };
-    if (tagsSearch.value.trim()) {
-      query.search = tagsSearch.value.trim();
-    }
-    if (selectedCategoryFilter.value !== null) {
-      query.categoryId = selectedCategoryFilter.value.toString();
-    }
-
-    const response = await $fetch<{
-      tags: Tag[];
-      pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        pages: number;
-      };
-    }>("/api/tags", {
-      query,
-    });
-    tags.value = response.tags;
-    pagination.value = response.pagination;
-  } catch (error) {
-    console.error("Ошибка при загрузке тегов:", error);
-    toast.add({
-      severity: "error",
-      summary: "Ошибка",
-      detail: extractErrorMessage(error, "Не удалось загрузить теги"),
-    });
-  } finally {
-    tagsLoading.value = false;
-  }
-};
+// fetchTags больше не нужна - используем refreshTags напрямую
+// Очистка кеша происходит только после мутаций
 
 const refreshData = async () => {
-  await Promise.all([fetchCategories(), fetchTags()]);
+  // Очищаем кеш перед обновлением (только при ручном обновлении)
+  await clearNuxtData(cacheKey.value);
+  await Promise.all([fetchCategories(), refreshTags()]);
 };
 
 const openTagModal = (tag?: Tag | null) => {
@@ -342,9 +379,10 @@ const handleTagModalSave = async ({
   tagModal.saving = true;
   try {
     if (isUpdate && id) {
-      await $fetch(`/api/tags/${id}`, {
-        method: "PUT",
-        body: payload,
+      await trpc.tags.update.mutate({
+        id: id.toString(),
+        name: payload.name,
+        categoryId: payload.categoryId?.toString() || null,
       });
       toast.add({
         severity: "success",
@@ -352,9 +390,9 @@ const handleTagModalSave = async ({
         detail: "Тег обновлен",
       });
     } else {
-      await $fetch("/api/tags", {
-        method: "POST",
-        body: payload,
+      await trpc.tags.create.mutate({
+        name: payload.name,
+        categoryId: payload.categoryId?.toString(),
       });
       toast.add({
         severity: "success",
@@ -363,7 +401,9 @@ const handleTagModalSave = async ({
       });
     }
     handleTagModalClose();
-    await refreshData();
+    // Очищаем кеш и обновляем данные после мутации
+    await clearNuxtData(cacheKey.value);
+    await refreshTags();
   } catch (error) {
     console.error("Ошибка при обновлении тега:", error);
     toast.add({
@@ -378,9 +418,7 @@ const handleTagModalSave = async ({
 
 const deleteTag = async (tag: Tag) => {
   try {
-    await $fetch(`/api/tags/${tag.id}`, {
-      method: "DELETE",
-    });
+    await trpc.tags.delete.mutate({ id: tag.id.toString() });
 
     toast.add({
       severity: "success",
@@ -388,7 +426,9 @@ const deleteTag = async (tag: Tag) => {
       detail: `Тег "${tag.name}" удален`,
     });
 
-    await refreshData();
+    // Очищаем кеш и обновляем данные после удаления
+    await clearNuxtData(cacheKey.value);
+    await refreshTags();
   } catch (error) {
     console.error("Ошибка при удалении тега:", error);
     toast.add({
@@ -414,13 +454,13 @@ const confirmDeleteTag = (tag: Tag) => {
 
 watch([tagsSearch, selectedCategoryFilter], () => {
   pagination.value.page = 1;
-  fetchTags();
+  // Данные автоматически обновятся через watch [queryParams]
 });
 
 const onPageChange = (event: PageEvent) => {
   pagination.value.page = event.page + 1;
   pagination.value.limit = event.rows;
-  fetchTags();
+  // Данные автоматически обновятся через watch [queryParams]
 };
 
 onMounted(() => {

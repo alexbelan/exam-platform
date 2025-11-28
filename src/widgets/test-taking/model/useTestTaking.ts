@@ -1,10 +1,5 @@
 import { computed, ref, watch } from "vue";
-import {
-  getTestMeta,
-  generateTestQuestions,
-  getQuestion,
-  updateUncorrectedQuestions,
-} from "../api/test-taking.api";
+import { useAsyncTestTaking } from "./useAsyncTestTaking";
 import type {
   TestMetaResponse,
   TestGenerateResponse,
@@ -22,6 +17,7 @@ type TestResponse = {
 
 export function useTestTaking(testId: string | number) {
   const store = useTestSessionStore();
+  const { getTestMeta, generateTestQuestions, getQuestion, updateUncorrectedQuestions } = useAsyncTestTaking(testId);
 
   // Инициализация теста - проверяем сохраненную сессию
   const {
@@ -46,7 +42,7 @@ export function useTestTaking(testId: string | number) {
     refresh: refreshMeta,
   } = useAsyncData<TestMetaResponse>(
     `test-meta-${testId}`,
-    () => getTestMeta(testId),
+    async () => await getTestMeta(),
     {
       immediate: true,
     }
@@ -60,7 +56,7 @@ export function useTestTaking(testId: string | number) {
     refresh: generateQuestions,
   } = useAsyncData<TestGenerateResponse>(
     `test-generate-${testId}`,
-    () => generateTestQuestions(testId),
+    async () => await generateTestQuestions(),
     {
       immediate: false, // Не генерируем сразу, только по запросу
     }

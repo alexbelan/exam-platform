@@ -1,13 +1,12 @@
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { useProfileStateStore } from "@entities/profile-state";
-import { getProfileStatistics } from "../api/profile-statistics.api";
+import { useAsyncProfileStatistics } from "./useAsyncProfileStatistics";
 import type { UseProfileStatisticsReturn } from "./types";
 import type { ProfileStatistics } from "@entities/profile-state";
 
 export function useProfileStatistics(): UseProfileStatisticsReturn {
   const store = useProfileStateStore();
-
-  // Получаем userId из сессии
+  const { getStatistics } = useAsyncProfileStatistics();
   const { user } = useUserSession();
   const userId = computed(() => user.value?.id);
 
@@ -28,19 +27,19 @@ export function useProfileStatistics(): UseProfileStatisticsReturn {
         return store.statistics;
       }
 
-      // Загружаем данные
-      const response = await getProfileStatistics();
+      // Загружаем данные через tRPC
+      const result = await getStatistics();
 
       // Преобразуем в нужный формат
       const statistics: ProfileStatistics = {
-        totalTestsCompleted: response.totalTestsCompleted,
-        totalQuestionsAnswered: response.totalQuestionsAnswered,
-        totalCorrectAnswers: response.totalCorrectAnswers,
-        averageScore: response.averageScore,
-        problematicQuestionsCount: response.problematicQuestionsCount,
-        uncorrectedQuestionsCount: response.uncorrectedQuestionsCount,
-        lastActivityAt: response.lastActivityAt
-          ? new Date(response.lastActivityAt)
+        totalTestsCompleted: result.totalTestsCompleted,
+        totalQuestionsAnswered: result.totalQuestionsAnswered,
+        totalCorrectAnswers: result.totalCorrectAnswers,
+        averageScore: result.averageScore,
+        problematicQuestionsCount: result.problematicQuestionsCount,
+        uncorrectedQuestionsCount: result.uncorrectedQuestionsCount,
+        lastActivityAt: result.lastActivityAt
+          ? new Date(result.lastActivityAt)
           : null,
       };
 

@@ -1,4 +1,5 @@
 import { computed, ref, watch } from "vue";
+import { useAsyncTestQuestion } from "./useAsyncTestQuestion";
 import type { TestQuestionProps } from "./types";
 import type { Question } from "./types";
 
@@ -78,9 +79,8 @@ export function useTestQuestion(
     error.value = false;
 
     try {
-      const response = await $fetch<QuestionResponse>(
-        `/api/questions/${props.questionId}`
-      );
+      const { getQuestion } = useAsyncTestQuestion();
+      const response = await getQuestion(props.questionId);
       question.value = response.question;
     } catch (err) {
       console.error("Error loading question:", err);

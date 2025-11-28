@@ -1,7 +1,7 @@
 import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick, type ComputedRef } from "vue";
 import { useProfileStateStore } from "@entities/profile-state";
 import { useProfileFavorites } from "@features/profile-favorites";
-import { getIncorrectAnswers } from "../api/workspace-profile-display.api";
+import { useAsyncWorkspaceProfileDisplay } from "./useAsyncWorkspaceProfileDisplay";
 import type { UseWorkspaceProfileDisplayReturn } from "./types";
 import type { WorkspaceQuestion } from "@entities/questions-card/model/types";
 import type { WorkspaceTest } from "@entities/test-card/model/types";
@@ -73,7 +73,8 @@ export function useWorkspaceProfileDisplay(): UseWorkspaceProfileDisplayReturn {
         }
 
         case "incorrect-answers": {
-          // Загружаем неправильные ответы через API
+          // Загружаем неправильные ответы через tRPC
+          const { getIncorrectAnswers } = useAsyncWorkspaceProfileDisplay();
           const response = await getIncorrectAnswers(page, 12);
           
           const normalizedQuestions: WorkspaceQuestion[] = response.questions.map((q) => ({

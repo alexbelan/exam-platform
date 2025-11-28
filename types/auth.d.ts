@@ -1,7 +1,12 @@
 declare module "#auth-utils" {
   interface User {
     id: number;
-    email: string;
+    // Telegram авторизация
+    telegramId?: string;
+    telegramUsername?: string | null;
+    // Email авторизация (для админов)
+    email?: string;
+    // Общие поля
     firstName?: string | null;
     lastName?: string | null;
     role: "USER" | "ADMIN";
@@ -12,7 +17,7 @@ declare module "#auth-utils" {
   }
 
   interface SecureSessionData {
-    // Добавьте здесь приватные данные сессии, если нужно
+    // Приватные данные сессии
   }
 }
 

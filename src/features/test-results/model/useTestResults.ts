@@ -113,9 +113,8 @@ export function useTestResults(props: TestResultsProps) {
     loadingQuestions.value.add(questionId);
 
     try {
-      const response = await $fetch<QuestionResponse>(
-        `/api/questions/${questionId}`
-      );
+      const { getQuestion } = useAsyncTestResults();
+      const response = await getQuestion(questionId);
       const question = response.question;
       loadedQuestions.value.set(questionId, question);
       // Сохраняем в кэш стора для будущего использования

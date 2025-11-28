@@ -114,10 +114,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import Tag from "primevue/tag";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { FormInput, Table, ColorPicker } from "@shared/ui";
+import { trpc } from "#shared/lib/trpc";
 import type { TableColumn, PageEvent } from "@shared/ui/Table";
 import { useConfirm } from "primevue/useconfirm";
 import { AdminTagCategoryModal } from "@features/admin-tag-category-modal";
@@ -135,8 +136,6 @@ const confirm = useConfirm();
 
 type CategoryTableItem = CategoryEntity & { tagCount: number };
 
-const categories = ref<CategoryTableItem[]>([]);
-const loading = ref(false);
 const creating = ref(false);
 const rowsPerPageOptions = [10, 25, 50];
 const pagination = ref({
@@ -144,6 +143,83 @@ const pagination = ref({
   limit: 10,
   total: 0,
   pages: 0,
+});
+
+// Параметры запроса для кеширования
+const queryParams = computed(() => ({
+  page: pagination.value.page,
+  limit: pagination.value.limit,
+}));
+
+// Ключ кеша
+const cacheKey = computed(
+  () => `admin-tag-categories-${JSON.stringify(queryParams.value)}`
+);
+
+// Кеширование через useAsyncData
+const {
+  data: categoriesData,
+  pending: loading,
+  error,
+  refresh: refreshCategories,
+} = useAsyncData(
+  cacheKey,
+  async () => {
+    const response = await trpc.tagCategories.getList.query({
+      page: queryParams.value.page,
+      limit: queryParams.value.limit,
+    });
+
+    const processedCategories = response.categories.map(
+      (category: CategoryEntity & { _count?: { tags: number } }) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        color: category.color,
+        tagCount: (category as any)._count?.tags ?? 0,
+      })
+    );
+
+    return {
+      categories: processedCategories as CategoryTableItem[],
+      pagination: response.pagination,
+    };
+  },
+  {
+    immediate: true,
+    watch: [queryParams],
+    getCachedData: (key, nuxtApp) => {
+      const cached = nuxtApp.payload.data[key];
+      if (cached) {
+        return cached;
+      }
+      return undefined;
+    },
+  }
+);
+
+// Синхронизируем данные из кеша
+const categories = computed(() => categoriesData.value?.categories ?? []);
+watch(
+  categoriesData,
+  (newData) => {
+    if (newData) {
+      pagination.value = newData.pagination;
+    }
+  },
+  { immediate: true }
+);
+
+// Обработка ошибок
+watch(error, (err) => {
+  if (err) {
+    console.error("Ошибка при загрузке категорий:", err);
+    toast.add({
+      severity: "error",
+      summary: "Ошибка",
+      detail: extractErrorMessage(err, "Не удалось загрузить категории"),
+    });
+  }
 });
 
 const newCategory = reactive({
@@ -217,40 +293,9 @@ const extractErrorMessage = (error: any, fallback: string) =>
   fallback;
 
 const fetchCategories = async () => {
-  loading.value = true;
-  try {
-    const params = new URLSearchParams({
-      page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString(),
-    });
-    const response = await $fetch<{
-      categories: Array<CategoryEntity & { _count?: { tags: number } }>;
-      pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        pages: number;
-      };
-    }>(`/api/tag-categories?${params}`);
-
-    categories.value = response.categories.map((category) => ({
-      id: category.id,
-      name: category.name,
-      slug: category.slug,
-      color: category.color,
-      tagCount: category._count?.tags ?? 0,
-    }));
-    pagination.value = response.pagination;
-  } catch (error) {
-    console.error("Ошибка при загрузке категорий:", error);
-    toast.add({
-      severity: "error",
-      summary: "Ошибка",
-      detail: extractErrorMessage(error, "Не удалось загрузить категории"),
-    });
-  } finally {
-    loading.value = false;
-  }
+  // Очищаем кеш перед обновлением, чтобы гарантировать свежие данные
+  await clearNuxtData(cacheKey.value);
+  await refreshCategories();
 };
 
 const handleCreateCategory = async () => {
@@ -265,12 +310,9 @@ const handleCreateCategory = async () => {
 
   creating.value = true;
   try {
-    await $fetch("/api/tag-categories", {
-      method: "POST",
-      body: {
+    await trpc.tagCategories.create.mutate({
         name: newCategory.name.trim(),
         color: normalizeHex(newCategory.color) || TAG_CATEGORY_DEFAULT_COLOR,
-      },
     });
 
     toast.add({
@@ -318,12 +360,10 @@ const handleModalSave = async ({
 
   modal.saving = true;
   try {
-    await $fetch(`/api/tag-categories/${id}`, {
-      method: "PUT",
-      body: {
+    await trpc.tagCategories.update.mutate({
+      id: id.toString(),
         name,
         color,
-      },
     });
 
     toast.add({
@@ -348,9 +388,7 @@ const handleModalSave = async ({
 
 const deleteCategory = async (category: CategoryTableItem) => {
   try {
-    await $fetch(`/api/tag-categories/${category.id}`, {
-      method: "DELETE",
-    });
+    await trpc.tagCategories.delete.mutate({ id: category.id.toString() });
 
     toast.add({
       severity: "success",
@@ -388,12 +426,8 @@ const confirmDeleteCategory = (category: CategoryTableItem) => {
 const onPageChange = (event: PageEvent) => {
   pagination.value.page = event.page + 1;
   pagination.value.limit = event.rows;
-  fetchCategories();
+  // Данные автоматически обновятся через watch [queryParams]
 };
-
-onMounted(() => {
-  fetchCategories();
-});
 </script>
 
 <style scoped>

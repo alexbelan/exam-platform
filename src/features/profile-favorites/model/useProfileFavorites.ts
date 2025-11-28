@@ -1,17 +1,11 @@
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { useProfileStateStore } from "@entities/profile-state";
-import {
-  getFavoriteQuestions,
-  getFavoriteTests,
-} from "../api/profile-favorites.api";
+import { useAsyncProfileFavorites } from "./useAsyncProfileFavorites";
 import type { UseProfileFavoritesReturn } from "./types";
-import type { WorkspaceQuestion } from "@entities/questions-card/model/types";
-import type { WorkspaceTest } from "@entities/test-card/model/types";
 
 export function useProfileFavorites(): UseProfileFavoritesReturn {
   const store = useProfileStateStore();
-
-  // Получаем userId из сессии
+  const { getFavoriteQuestions, getFavoriteTests } = useAsyncProfileFavorites();
   const { user } = useUserSession();
   const userId = computed(() => user.value?.id);
 
@@ -87,13 +81,16 @@ export function useProfileFavorites(): UseProfileFavoritesReturn {
   return {
     favoriteQuestions: computed(() => favoriteQuestionsData.value || []),
     favoriteQuestionsPending: computed(() => favoriteQuestionsPending.value),
-    favoriteQuestionsError: computed(() => favoriteQuestionsError.value as Error | null),
+    favoriteQuestionsError: computed(
+      () => favoriteQuestionsError.value as Error | null
+    ),
     refreshFavoriteQuestions,
 
     favoriteTests: computed(() => favoriteTestsData.value || []),
     favoriteTestsPending: computed(() => favoriteTestsPending.value),
-    favoriteTestsError: computed(() => favoriteTestsError.value as Error | null),
+    favoriteTestsError: computed(
+      () => favoriteTestsError.value as Error | null
+    ),
     refreshFavoriteTests,
   };
 }
-

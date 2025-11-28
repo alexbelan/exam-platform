@@ -1,9 +1,11 @@
 import { ref, computed } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
+import { useAsyncAuthButton } from "./useAsyncAuthButton";
 import type { User, AuthButtonProps } from "./types";
 
 export function useAuthButton(props: AuthButtonProps = {}) {
   const { loggedIn, user, clear } = useUserSession();
+  const { logout } = useAsyncAuthButton();
   const toast = useToastClient();
   const loading = ref(false);
 
@@ -27,7 +29,7 @@ export function useAuthButton(props: AuthButtonProps = {}) {
 
     loading.value = true;
     try {
-      await $fetch("/api/logout", { method: "POST" });
+      await logout();
       await clear();
       toast.add({
         severity: "success",

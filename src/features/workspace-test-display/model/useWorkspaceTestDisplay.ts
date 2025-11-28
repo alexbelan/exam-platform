@@ -1,5 +1,6 @@
 import { computed } from "vue";
-import type { TestsResponse, WorkspaceTestDisplayFilters } from "./types";
+import { useAsyncWorkspaceTestDisplay } from "./useAsyncWorkspaceTestDisplay";
+import type { WorkspaceTestDisplayFilters } from "./types";
 import type { WorkspaceTest } from "@entities/test-card";
 
 interface UseWorkspaceTestDisplayOptions {
@@ -7,7 +8,10 @@ interface UseWorkspaceTestDisplayOptions {
   immediate?: boolean;
 }
 
-export function useWorkspaceTestDisplay(options?: UseWorkspaceTestDisplayOptions) {
+export function useWorkspaceTestDisplay(
+  options?: UseWorkspaceTestDisplayOptions
+) {
+  const { getTests } = useAsyncWorkspaceTestDisplay();
   const filtersSource = options?.filters;
   const filters = computed(() => {
     if (typeof filtersSource === "function") {
@@ -16,39 +20,36 @@ export function useWorkspaceTestDisplay(options?: UseWorkspaceTestDisplayOptions
     return filtersSource ?? {};
   });
 
-  const queryParams = computed(() => {
-    const params: Record<string, string> = {
-      isPublished: "true",
-    };
-    
-    if (filters.value.search?.trim()) {
-      params.search = filters.value.search.trim();
-    }
-    
-    if (filters.value.tags && filters.value.tags.length > 0) {
-      params.tags = filters.value.tags.join(",");
-    }
-    
-    return params;
-  });
+  const queryParams = computed(() => ({
+    page: 1,
+    limit: 10,
+    isPublished: true,
+    search: filters.value.search?.trim(),
+    tags: filters.value.tags,
+  }));
 
   const { data, pending, error, refresh } = useAsyncData(
     () => `workspace-tests-${JSON.stringify(queryParams.value)}`,
-    () =>
-      $fetch<TestsResponse>("/api/tests", {
-        query: queryParams.value,
-      }),
-    { 
+    async () => {
+      const result = await getTests(queryParams.value);
+      return result;
+    },
+    {
       immediate: options?.immediate ?? true,
       watch: [queryParams],
+      getCachedData: (key, nuxtApp) => {
+        const cached = nuxtApp.payload.data[key];
+        if (cached) {
+          return cached;
+        }
+        return undefined;
+      },
     }
   );
 
   const tests = computed<WorkspaceTest[]>(() =>
     (data.value?.tests ?? []).map((test) => {
-      const normalizeTag = (
-        tag: NonNullable<TestsResponse["tests"][number]["tags"]>[number]
-      ) => ({
+      const normalizeTag = (tag: (typeof test.tags)[number]) => ({
         id: tag.id,
         name: tag.name,
         category: tag.category
@@ -87,4 +88,3 @@ export function useWorkspaceTestDisplay(options?: UseWorkspaceTestDisplayOptions
     refresh,
   };
 }
-

@@ -76,11 +76,17 @@ import { QuestionCard } from "@entities/questions-card";
 import { useWorkspaceQuestionsDisplay } from "../model/useWorkspaceQuestionsDisplay";
 
 interface WorkspaceQuestionsDisplayProps {
-  filters?: {
-    search?: string;
-    level?: string;
-    tags?: string[];
-  };
+  filters?:
+    | {
+        search?: string;
+        level?: string;
+        tags?: string[];
+      }
+    | (() => {
+        search?: string;
+        level?: string;
+        tags?: string[];
+      });
   bookmarks?: Set<number>;
 }
 

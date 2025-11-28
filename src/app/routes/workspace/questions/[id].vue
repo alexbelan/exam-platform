@@ -90,14 +90,13 @@ const {
   error,
 } = await useAsyncData(
   questionKey,
-  () =>
-    $fetch<{ success: boolean; question: WorkspaceQuestion }>(
-      `/api/questions/${id.value}` as const,
-      { method: "GET" }
-    ),
+  async () => {
+    const { getQuestion } = useAsyncTestQuestion();
+    const response = await getQuestion(Number(id.value));
+    return response.question;
+  },
   {
     watch: [id],
-    transform: (response) => response?.question ?? null,
   }
 );
 

@@ -154,6 +154,7 @@
 
 <script setup lang="ts">
 import { useToastClient } from "@shared/hooks/useToastClient";
+import { trpc } from "#shared/lib/trpc";
 import {
   TextEditor,
   FormAutoComplete,
@@ -180,7 +181,7 @@ interface Answer {
 }
 
 interface QuestionAnswer {
-  id: number;
+  id: number | string; // Может быть временный ID при создании
   answerId: number;
   answer: Answer;
   isCorrect: boolean;
@@ -276,13 +277,13 @@ const fetchQuestion = async () => {
 
   loading.value = true;
   try {
-    const response = await $fetch<{ success: boolean; question: Question }>(
-      `/api/questions/${questionId}`
-    );
+    const response = await trpc.questions.getById.query({
+      id: Number(questionId),
+    });
     if (!response.question) {
       throw new Error("Вопрос не найден");
     }
-    question.value = response.question;
+    question.value = response.question as Question;
     questionForm.value = {
       title: question.value.title,
       content: question.value.content,
@@ -319,10 +320,12 @@ const fetchQuestion = async () => {
 // Поиск тегов через API
 const searchTags = async (query: string): Promise<Tag[]> => {
   try {
-    const response = await $fetch<{ tags: Tag[] }>("/api/tags", {
-      query: { search: query },
+    const response = await trpc.tags.getList.query({
+      page: 1,
+      limit: 50,
+      search: query,
     });
-    return response.tags;
+    return response.tags as Tag[];
   } catch (error) {
     console.error("Ошибка при поиске тегов:", error);
     return [];
@@ -332,12 +335,16 @@ const searchTags = async (query: string): Promise<Tag[]> => {
 // Поиск ответов через API
 const searchAnswers = async (query: string): Promise<Answer[]> => {
   try {
-    const response = await $fetch<{ answers: Answer[] }>("/api/answers", {
-      query: { search: query },
+    const response = await trpc.answers.getList.query({
+      search: query,
     });
+    // getAnswerList возвращает { answers: Answer[] }
+    const answers = response.answers || [];
     // Исключаем уже добавленные ответы
     const existingAnswerIds = questionAnswers.value.map((qa) => qa.answerId);
-    return response.answers.filter((a) => !existingAnswerIds.includes(a.id));
+    return answers.filter(
+      (a: Answer) => !existingAnswerIds.includes(a.id)
+    ) as Answer[];
   } catch (error) {
     console.error("Ошибка при поиске ответов:", error);
     return [];
@@ -387,15 +394,7 @@ const handleAnswerSelect = (event: { value: Answer }) => {
 // Создание нового ответа через API
 const createAnswer = async (text: string): Promise<Answer> => {
   try {
-    const response = await $fetch<{ success: boolean; answer: Answer }>(
-      "/api/answers",
-      {
-        method: "POST",
-        body: { text },
-      }
-    );
-
-    console.log("response", response);
+    const response = await trpc.answers.create.mutate({ text });
 
     if (response.success && response.answer) {
       toast.add({
@@ -403,7 +402,7 @@ const createAnswer = async (text: string): Promise<Answer> => {
         summary: "Успешно",
         detail: `Ответ "${response.answer.text}" создан`,
       });
-      return response.answer;
+      return response.answer as Answer;
     }
 
     throw new Error("Не удалось создать ответ");
@@ -516,24 +515,36 @@ const saveQuestion = async () => {
   try {
     // Преобразуем ответы для отправки на сервер
     const answersPayload = questionAnswers.value.map((qa) => ({
-      id: qa.answerId,
+      id: qa.answerId.toString(),
       isCorrect: qa.isCorrect,
     }));
 
     // Преобразуем теги для отправки на сервер
+    const tagsPayload = selectedTags.value
+      .map((tag) =>
+        typeof tag === "object" && tag?.id
+          ? tag.id.toString()
+          : tag?.slug || tag?.id?.toString() || ""
+      )
+      .filter(Boolean);
+
+    // Преобразуем categoryId в string или undefined
+    const categoryId = questionForm.value.categoryId
+      ? questionForm.value.categoryId.toString()
+      : undefined;
+
     const payload = {
-      ...questionForm.value,
-      tags: selectedTags.value
-        .map((tag) => tag?.id || tag?.slug)
-        .filter(Boolean),
+      title: questionForm.value.title,
+      content: questionForm.value.content,
+      isPublished: questionForm.value.isPublished,
+      requiresPremium: questionForm.value.requiresPremium,
+      categoryId,
+      tags: tagsPayload,
       answers: answersPayload,
     };
 
     if (isNew) {
-      await $fetch("/api/questions", {
-        method: "POST",
-        body: payload,
-      });
+      await trpc.questions.create.mutate(payload);
 
       toast.add({
         severity: "success",
@@ -541,9 +552,9 @@ const saveQuestion = async () => {
         detail: "Вопрос создан",
       });
     } else {
-      await $fetch(`/api/questions/${questionId}`, {
-        method: "PUT",
-        body: payload,
+      await trpc.questions.update.mutate({
+        id: Number(questionId),
+        ...payload,
       });
 
       toast.add({

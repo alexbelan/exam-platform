@@ -151,8 +151,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watch } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { UserFormModal } from "@entities/user";
+import { trpc } from "#shared/lib/trpc";
 
 // Используем middleware для проверки прав администратора
 definePageMeta({
@@ -183,8 +185,6 @@ interface User {
 }
 
 // Реактивные данные
-const users = ref<User[]>([]);
-const loading = ref(false);
 const searchQuery = ref("");
 const selectedRole = ref<string | null>(null);
 const selectedStatus = ref<boolean | null>(null);
@@ -196,6 +196,91 @@ const pagination = ref({
   limit: 10,
   total: 0,
   pages: 0,
+});
+
+// Параметры запроса для кеширования
+const queryParams = computed(() => ({
+  page: pagination.value.page,
+  limit: pagination.value.limit,
+  search: searchQuery.value.trim() || undefined,
+  role: selectedRole.value || undefined,
+  status: selectedStatus.value !== null ? selectedStatus.value : undefined,
+  // subscription пока не поддерживается в tRPC роутере
+}));
+
+// Ключ кеша
+const cacheKey = computed(
+  () => `admin-users-${JSON.stringify(queryParams.value)}`
+);
+
+// Кеширование через useAsyncData
+const {
+  data: usersData,
+  pending: loading,
+  error,
+  refresh: refreshUsers,
+} = useAsyncData(
+  cacheKey,
+  async () => {
+    const response = await trpc.users.getList.query({
+      page: queryParams.value.page,
+      limit: queryParams.value.limit,
+      search: queryParams.value.search,
+      role: queryParams.value.role,
+      status: queryParams.value.status,
+    });
+
+    return {
+      users: response.users as User[],
+      pagination: response.pagination,
+    };
+  },
+  {
+    immediate: true,
+    watch: [queryParams],
+    getCachedData: (key, nuxtApp) => {
+      const cached = nuxtApp.payload.data[key];
+      if (cached) {
+        return cached;
+      }
+      return undefined;
+    },
+  }
+);
+
+// Синхронизируем данные из кеша
+const users = computed(() => usersData.value?.users ?? []);
+watch(
+  usersData,
+  (newData) => {
+    if (newData) {
+      pagination.value = newData.pagination;
+    }
+  },
+  { immediate: true }
+);
+
+// Фильтрация пользователей (теперь через API, но можно добавить клиентскую фильтрацию по subscription)
+const filteredUsers = computed(() => {
+  let result = users.value;
+  if (selectedSubscription.value) {
+    result = result.filter(
+      (user) => user.subscriptionType === selectedSubscription.value
+    );
+  }
+  return result;
+});
+
+// Обработка ошибок
+watch(error, (err) => {
+  if (err) {
+    console.error("Ошибка при загрузке пользователей:", err);
+    toast.add({
+      severity: "error",
+      summary: "Ошибка",
+      detail: "Не удалось загрузить пользователей",
+    });
+  }
 });
 
 // Опции для селектов фильтров
@@ -216,45 +301,12 @@ const roleOptions = [
   { label: "Администратор", value: "ADMIN" },
 ];
 
-// Загрузка пользователей
+// Загрузка пользователей (теперь через refresh)
 const fetchUsers = async () => {
-  loading.value = true;
-  try {
-    const params = new URLSearchParams({
-      page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString(),
-    });
-
-    if (searchQuery.value) {
-      params.append("search", searchQuery.value);
-    }
-    if (selectedRole.value) {
-      params.append("role", selectedRole.value);
-    }
-    if (selectedStatus.value !== null) {
-      params.append("status", selectedStatus.value.toString());
-    }
-    if (selectedSubscription.value) {
-      params.append("subscription", selectedSubscription.value);
-    }
-
-    const response = await $fetch(`/api/users?${params}`);
-    users.value = response.users;
-    pagination.value = response.pagination;
-  } catch (error) {
-    console.error("Ошибка при загрузке пользователей:", error);
-    toast.add({
-      severity: "error",
-      summary: "Ошибка",
-      detail: "Не удалось загрузить пользователей",
-    });
-  } finally {
-    loading.value = false;
-  }
+  // Очищаем кеш перед обновлением, чтобы гарантировать свежие данные
+  await clearNuxtData(cacheKey.value);
+  await refreshUsers();
 };
-
-// Фильтрация пользователей (теперь через API)
-const filteredUsers = computed(() => users.value);
 
 // Форматирование даты
 const formatDate = (dateString: string) => {
@@ -304,7 +356,7 @@ const getSubscriptionSeverity = (user: User): string => {
 // Просмотр пользователя
 const viewUser = async (user: User) => {
   try {
-    const response = await $fetch(`/api/users/${user.id}`);
+    const response = await trpc.users.getById.query({ id: user.id.toString() });
     console.log("Детали пользователя:", response.user);
     // Здесь можно открыть модальное окно с детальной информацией
   } catch (error) {
@@ -331,9 +383,7 @@ const deleteUser = async (user: User) => {
     )
   ) {
     try {
-      await $fetch(`/api/users/${user.id}`, {
-        method: "DELETE",
-      });
+      await trpc.users.delete.mutate({ id: user.id.toString() });
 
       toast.add({
         severity: "success",
@@ -341,7 +391,9 @@ const deleteUser = async (user: User) => {
         detail: "Пользователь удален",
       });
 
-      await fetchUsers();
+      // Очищаем кеш и обновляем данные после удаления
+      await clearNuxtData(cacheKey.value);
+      await refreshUsers();
     } catch (error) {
       console.error("Ошибка при удалении пользователя:", error);
       toast.add({
@@ -371,26 +423,22 @@ const exportUsers = () => {
   // Здесь можно реализовать экспорт в CSV/Excel
 };
 
-// Обработчики фильтров
-watch(
-  [searchQuery, selectedRole, selectedStatus, selectedSubscription],
-  () => {
-    pagination.value.page = 1; // Сброс на первую страницу при изменении фильтров
-    fetchUsers();
-  },
-  { deep: true }
-);
-
 // Обработчик пагинации
 const onPageChange = (event: any) => {
   pagination.value.page = event.page + 1;
-  fetchUsers();
+  pagination.value.limit = event.rows;
+  // Данные автоматически обновятся через watch [queryParams]
 };
 
-// Загрузка данных при монтировании компонента
-onMounted(() => {
-  fetchUsers();
-});
+// Обработчики фильтров
+watch(
+  [searchQuery, selectedRole, selectedStatus],
+  () => {
+    pagination.value.page = 1; // Сброс на первую страницу при изменении фильтров
+    // Данные автоматически обновятся через watch [queryParams]
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>

@@ -16,7 +16,7 @@
 
     <div class="workspace-questions-catalog__content-grid">
       <WorkspaceQuestionsDisplay
-        :filters="() => filters"
+        :filters="filters"
         :bookmarks="bookmarks"
         @open="handleOpen"
         @toggle-bookmark="handleToggleBookmark"

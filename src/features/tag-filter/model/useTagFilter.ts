@@ -2,6 +2,7 @@ import { computed, ref, watch, type Ref } from "vue";
 import appTheme from "~/themes/theme";
 import { normalizeHex, resolveThemeToken } from "@shared/utils";
 import { useLocalStorage } from "@shared/hooks";
+import { useAsyncTagFilter } from "./useAsyncTagFilter";
 import type { TagFilterEmits, TagFilterTag } from "./types";
 
 const UNCATEGORIZED_KEY = "__uncategorized";
@@ -27,13 +28,28 @@ export const useTagFilter = (
   modelValue: Ref<string[]>,
   emit: TagFilterEmits
 ) => {
+  const { getTags } = useAsyncTagFilter();
   const {
     data: tagsData,
     pending,
     error,
     refresh,
-  } = useAsyncData("tag-filter-tags", () =>
-    $fetch<{ tags: TagFilterTag[] }>("/api/tags")
+  } = useAsyncData(
+    "tag-filter-tags",
+    async () => {
+      try {
+        const result = await getTags();
+        // getTagList возвращает { tags, pagination? }
+        return { tags: result.tags || [] };
+      } catch (err) {
+        console.error("Error loading tags:", err);
+        throw err;
+      }
+    },
+    {
+      immediate: true, // Явно указываем, что нужно загружать сразу
+      server: false, // Не загружаем на сервере, только на клиенте (так как tRPC клиент работает только на клиенте)
+    }
   );
 
   const tags = computed(() => tagsData.value?.tags ?? []);
@@ -51,9 +67,9 @@ export const useTagFilter = (
       }
     >();
 
-    tags.value.forEach((tag) => {
+    tags.value.forEach((tag: TagFilterTag) => {
       const category = tag.category;
-      const key = category?.id ?? UNCATEGORIZED_KEY;
+      const key = category?.id ? String(category.id) : UNCATEGORIZED_KEY;
       if (!map.has(key)) {
         map.set(key, {
           key,
@@ -97,7 +113,7 @@ export const useTagFilter = (
     }
 
     selectedSet.value.forEach((slug) => {
-      const tag = tags.value.find((item) => item.slug === slug);
+      const tag = tags.value.find((item: TagFilterTag) => item.slug === slug);
       if (tag) {
         const categoryKey = tag.category?.id ?? UNCATEGORIZED_KEY;
         if (!expandedCategories.value.has(categoryKey)) {

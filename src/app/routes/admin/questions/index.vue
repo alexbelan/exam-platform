@@ -119,8 +119,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watch } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { Table } from "@shared/ui";
+import { trpc } from "#shared/lib/trpc";
 import type { TableColumn, PageEvent } from "@shared/ui/Table";
 
 // Используем middleware для проверки прав администратора
@@ -183,8 +185,6 @@ const columns: TableColumn<Question>[] = [
 ];
 
 // Реактивные данные
-const questions = ref<Question[]>([]);
-const loading = ref(false);
 const searchQuery = ref("");
 const selectedStatus = ref<boolean | null>(null);
 const pagination = ref({
@@ -192,6 +192,77 @@ const pagination = ref({
   limit: 10,
   total: 0,
   pages: 0,
+});
+
+// Параметры запроса для кеширования
+const queryParams = computed(() => ({
+  page: pagination.value.page,
+  limit: pagination.value.limit,
+  search: searchQuery.value.trim() || undefined,
+  status: selectedStatus.value !== null ? selectedStatus.value : undefined,
+}));
+
+// Ключ кеша
+const cacheKey = computed(
+  () => `admin-questions-${JSON.stringify(queryParams.value)}`
+);
+
+// Кеширование через useAsyncData
+const {
+  data: questionsData,
+  pending: loading,
+  error,
+  refresh: refreshQuestions,
+} = useAsyncData(
+  cacheKey,
+  async () => {
+    const response = await trpc.questions.getList.query({
+      page: queryParams.value.page,
+      limit: queryParams.value.limit,
+      search: queryParams.value.search,
+      status: queryParams.value.status,
+    });
+
+    return {
+      questions: response.questions as Question[],
+      pagination: response.pagination,
+    };
+  },
+  {
+    immediate: true,
+    watch: [queryParams],
+    getCachedData: (key, nuxtApp) => {
+      const cached = nuxtApp.payload.data[key];
+      if (cached) {
+        return cached;
+      }
+      return undefined;
+    },
+  }
+);
+
+// Синхронизируем данные из кеша
+const questions = computed(() => questionsData.value?.questions ?? []);
+watch(
+  questionsData,
+  (newData) => {
+    if (newData) {
+      pagination.value = newData.pagination;
+    }
+  },
+  { immediate: true }
+);
+
+// Обработка ошибок
+watch(error, (err) => {
+  if (err) {
+    console.error("Ошибка при загрузке вопросов:", err);
+    toast.add({
+      severity: "error",
+      summary: "Ошибка",
+      detail: "Не удалось загрузить вопросы",
+    });
+  }
 });
 
 // Опции для селектов фильтров
@@ -242,43 +313,11 @@ const getTagStyles = (tag: Tag) => {
   };
 };
 
-// Загрузка вопросов
+// Загрузка вопросов (теперь через refresh)
 const fetchQuestions = async () => {
-  loading.value = true;
-  try {
-    const params = new URLSearchParams({
-      page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString(),
-    });
-
-    if (searchQuery.value) {
-      params.append("search", searchQuery.value);
-    }
-    if (selectedStatus.value !== null) {
-      params.append("status", selectedStatus.value.toString());
-    }
-
-    const response = await $fetch<{
-      questions: Question[];
-      pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        pages: number;
-      };
-    }>(`/api/questions?${params}`);
-    questions.value = response.questions;
-    pagination.value = response.pagination;
-  } catch (error) {
-    console.error("Ошибка при загрузке вопросов:", error);
-    toast.add({
-      severity: "error",
-      summary: "Ошибка",
-      detail: "Не удалось загрузить вопросы",
-    });
-  } finally {
-    loading.value = false;
-  }
+  // Очищаем кеш перед обновлением, чтобы гарантировать свежие данные
+  await clearNuxtData(cacheKey.value);
+  await refreshQuestions();
 };
 
 // Форматирование даты
@@ -294,11 +333,9 @@ const viewQuestion = (question: Question) => {
 // Переключение публикации
 const togglePublish = async (question: Question) => {
   try {
-    await $fetch(`/api/questions/${question.id}`, {
-      method: "PUT",
-      body: {
+    await trpc.questions.update.mutate({
+      id: question.id,
         isPublished: !question.isPublished,
-      },
     });
 
     toast.add({
@@ -309,7 +346,9 @@ const togglePublish = async (question: Question) => {
         : "Вопрос опубликован",
     });
 
-    await fetchQuestions();
+    // Очищаем кеш и обновляем данные после изменения
+    await clearNuxtData(cacheKey.value);
+    await refreshQuestions();
   } catch (error) {
     console.error("Ошибка при изменении статуса:", error);
     toast.add({
@@ -324,9 +363,7 @@ const togglePublish = async (question: Question) => {
 const deleteQuestion = async (question: Question) => {
   if (confirm(`Вы уверены, что хотите удалить вопрос "${question.title}"?`)) {
     try {
-      await $fetch(`/api/questions/${question.id}`, {
-        method: "DELETE",
-      });
+      await trpc.questions.delete.mutate({ id: question.id });
 
       toast.add({
         severity: "success",
@@ -334,7 +371,9 @@ const deleteQuestion = async (question: Question) => {
         detail: "Вопрос удален",
       });
 
-      await fetchQuestions();
+      // Очищаем кеш и обновляем данные после удаления
+      await clearNuxtData(cacheKey.value);
+      await refreshQuestions();
     } catch (error) {
       console.error("Ошибка при удалении вопроса:", error);
       toast.add({
@@ -356,7 +395,7 @@ watch(
   [searchQuery, selectedStatus],
   () => {
     pagination.value.page = 1; // Сброс на первую страницу при изменении фильтров
-    fetchQuestions();
+    // Данные автоматически обновятся через watch [queryParams]
   },
   { deep: true }
 );
@@ -365,13 +404,8 @@ watch(
 const onPageChange = (event: PageEvent) => {
   pagination.value.page = event.page + 1;
   pagination.value.limit = event.rows;
-  fetchQuestions();
+  // Данные автоматически обновятся через watch [queryParams]
 };
-
-// Загрузка данных при монтировании компонента
-onMounted(() => {
-  fetchQuestions();
-});
 </script>
 
 <style scoped>
