@@ -1,2 +1,2 @@
-export { normalizeHex, resolveThemeToken } from "./color";
+export { normalizeHex, getContrastColor, resolveThemeToken } from "./color";
 export { storage } from "./storage";

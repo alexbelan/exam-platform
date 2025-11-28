@@ -1,0 +1,33 @@
+.tag-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.tag-category-cell {
+  display: flex;
+  align-items: center;
+}
+
+.tag-chip {
+  border-radius: 9999px;
+}
+
+.text-muted {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+

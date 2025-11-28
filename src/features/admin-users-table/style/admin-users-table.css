@@ -1,0 +1,27 @@
+.users-table {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.subscription-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.subscription-expiry {
+  margin-top: 0.25rem;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
