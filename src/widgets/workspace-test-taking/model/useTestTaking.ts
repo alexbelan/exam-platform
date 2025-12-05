@@ -17,7 +17,13 @@ type TestResponse = {
 
 export function useTestTaking(testId: string | number) {
   const store = useTestSessionStore();
-  const { getTestMeta, generateTestQuestions, getQuestion, updateUncorrectedQuestions } = useAsyncTestTaking(testId);
+  const {
+    getTestMeta,
+    generateTestQuestions,
+    getQuestion,
+    updateUncorrectedQuestions,
+    submitTestAttempt,
+  } = useAsyncTestTaking(testId);
 
   // Инициализация теста - проверяем сохраненную сессию
   const {
@@ -304,40 +310,76 @@ export function useTestTaking(testId: string | number) {
 
   // Завершение теста
   const endTest = async () => {
-    if (confirm("Вы уверены, что хотите завершить тест?")) {
-      // Сохраняем ответы для текущего вопроса перед завершением
-      const currentId = currentQuestionId.value;
-      if (currentId) {
-        store.saveAnswer(currentId, selectedAnswers.value);
-      }
+    // Сохраняем ответы для текущего вопроса перед завершением
+    const currentId = currentQuestionId.value;
+    if (currentId) {
+      store.saveAnswer(currentId, selectedAnswers.value);
+    }
 
+    try {
+      await calculateResults();
+
+      if (!testData.value) return;
+
+      // Собираем данные для сохранения результатов
+      const totalQuestions = testData.value.questions.length;
+      const score = (correctAnswers.value / totalQuestions) * 100;
+      const startedAtDate = store.startedAt
+        ? new Date(store.startedAt)
+        : new Date();
+      const completedAt = new Date();
+      const timeSpent = Math.floor(
+        (completedAt.getTime() - startedAtDate.getTime()) / 1000
+      ); // в секундах
+
+      // Формируем данные для сохранения
+      const questionAnswers = Array.from(questionResults.value.entries()).map(
+        ([questionId, result]) => ({
+          questionId,
+          userAnswerIds: Array.from(result.userAnswerIds),
+          correctAnswerIds: Array.from(result.correctAnswerIds),
+          isCorrect: result.isCorrect,
+        })
+      );
+
+      // Сохраняем результаты в БД
       try {
-        await calculateResults();
-
-        // Отправляем неправильные вопросы на сервер для обновления счетчика
-        const incorrectQuestionIds = Array.from(questionResults.value.entries())
-          .filter(([_, result]) => !result.isCorrect)
-          .map(([questionId, _]) => questionId);
-
-        if (incorrectQuestionIds.length > 0) {
-          try {
-            await updateUncorrectedQuestions({
-              questionIds: incorrectQuestionIds,
-            });
-          } catch (error) {
-            console.error("Error updating uncorrected questions count:", error);
-            // Не блокируем показ результатов, если обновление не удалось
-          }
-        }
-
-        // Сначала устанавливаем showResults, потом сбрасываем isTestStarted
-        showResults.value = true;
-        // Очищаем startedAt, но сохраняем ответы и позицию
-        store.startedAt = null;
-        store.saveToStorage();
+        await submitTestAttempt({
+          testId: Number(testId),
+          totalQuestions,
+          correctAnswers: correctAnswers.value,
+          score,
+          timeSpent,
+          startedAt: startedAtDate,
+          completedAt,
+          questionAnswers,
+        });
       } catch (error) {
-        console.error("Error calculating results:", error);
+        console.error("Error saving test attempt:", error);
+        // Не блокируем показ результатов, если сохранение не удалось
       }
+
+      // Отправляем неправильные вопросы на сервер для обновления счетчика
+      const incorrectQuestionIds = Array.from(questionResults.value.entries())
+        .filter(([_, result]) => !result.isCorrect)
+        .map(([questionId, _]) => questionId);
+
+      if (incorrectQuestionIds.length > 0) {
+        try {
+          await updateUncorrectedQuestions(incorrectQuestionIds);
+        } catch (error) {
+          console.error("Error updating uncorrected questions count:", error);
+          // Не блокируем показ результатов, если обновление не удалось
+        }
+      }
+
+      // Сначала устанавливаем showResults, потом сбрасываем isTestStarted
+      showResults.value = true;
+      // Очищаем startedAt, но сохраняем ответы и позицию
+      store.startedAt = null;
+      store.saveToStorage();
+    } catch (error) {
+      console.error("Error calculating results:", error);
     }
   };
 

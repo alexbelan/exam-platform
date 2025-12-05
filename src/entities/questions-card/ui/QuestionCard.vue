@@ -43,7 +43,6 @@ const emit = defineEmits<{
 
 const { isBookmarked, open, toggleBookmark } = useQuestionCard({
   question: props.question,
-  bookmarks: props.bookmarks,
   onToggleBookmark: (id: number) => emit("toggle-bookmark", id),
   onOpen: (id: number) => emit("open", id),
 });

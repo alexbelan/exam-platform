@@ -1,11 +1,17 @@
 <template>
   <div class="question-details" v-if="question">
     <div class="question-header">
+      <Button label="Назад" icon="pi pi-arrow-left" text @click="goBack" />
       <Button
-        label="Назад к вопросам"
-        icon="pi pi-arrow-left"
+        :icon="question?.isFavorite ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+        :severity="question?.isFavorite ? 'success' : 'secondary'"
+        :loading="togglingFavorite"
+        rounded
         text
-        @click="navigateTo('/workspace/questions')"
+        v-tooltip.top="
+          question?.isFavorite ? 'Удалить из сохраненных' : 'Сохранить вопрос'
+        "
+        @click="handleToggleBookmark"
       />
     </div>
 
@@ -26,23 +32,6 @@
       <p v-if="question.description">{{ question.description }}</p>
       <div class="question-content" v-html="question.content" />
     </div>
-
-    <div class="question-actions">
-      <Button
-        :label="bookmarked ? 'Удалить из сохраненных' : 'Сохранить вопрос'"
-        :icon="bookmarked ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
-        :severity="bookmarked ? 'success' : 'secondary'"
-        outlined
-        @click="toggleBookmark"
-      />
-      <Button
-        label="Перейти к тесту по теме"
-        icon="pi pi-list-check"
-        severity="secondary"
-        text
-        @click="navigateTo('/workspace/tests')"
-      />
-    </div>
   </div>
 
   <div v-else class="state-box">
@@ -54,60 +43,27 @@
     <template v-else>
       <i class="pi pi-inbox" />
       <span>Вопрос не найден.</span>
-      <Button
-        label="Вернуться к списку"
-        icon="pi pi-arrow-left"
-        text
-        @click="navigateTo('/workspace/questions')"
-      />
+      <Button label="Назад" icon="pi pi-arrow-left" text @click="goBack" />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Tag as UiTag } from "@shared/ui";
-import type { WorkspaceQuestion } from "@entities/questions-card/model/types";
+import { useWorkspaceQuestionDetail } from "../model/useWorkspaceQuestionDetail";
 
 const props = defineProps<{
   questionId: number;
 }>();
 
-const bookmarks = useState<Set<number>>(
-  "workspace-question-bookmarks",
-  () => new Set()
-);
-
-const questionKey = computed(() => `workspace-question-${props.questionId}`);
-
 const {
-  data: question,
+  question,
   pending,
   error,
-} = await useAsyncData(
-  questionKey,
-  async () => {
-    const { getQuestion } = useAsyncTestQuestion();
-    const response = await getQuestion(props.questionId);
-    return response.question;
-  },
-  {
-    watch: [() => props.questionId],
-  }
-);
-
-const bookmarked = computed(() => bookmarks.value.has(props.questionId));
-
-const toggleBookmark = () => {
-  const key = props.questionId;
-  if (bookmarks.value.has(key)) {
-    const next = new Set(bookmarks.value);
-    next.delete(key);
-    bookmarks.value = next;
-  } else {
-    bookmarks.value = new Set([...bookmarks.value, key]);
-  }
-};
+  togglingFavorite,
+  handleToggleBookmark,
+  goBack,
+} = useWorkspaceQuestionDetail(() => props.questionId);
 </script>
 
 <style scoped src="../style/workspace-question-detail.css"></style>
-

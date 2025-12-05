@@ -1,13 +1,15 @@
-import { z } from 'zod';
-import { router, protectedProcedure } from '../index';
+import { z } from "zod";
+import { router, protectedProcedure } from "../index";
 import {
   getStatistics,
   getIncorrectAnswers,
   updateUncorrectedQuestions,
   getFavoriteQuestions,
   getFavoriteTests,
-} from '../../services/profile';
-import { TRPCError } from '@trpc/server';
+  toggleFavoriteQuestion,
+  toggleFavoriteTest,
+} from "../../services/profile";
+import { TRPCError } from "@trpc/server";
 
 export const profileRouter = router({
   /**
@@ -17,8 +19,8 @@ export const profileRouter = router({
     try {
       if (!ctx.user) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Пользователь не авторизован',
+          code: "UNAUTHORIZED",
+          message: "Пользователь не авторизован",
         });
       }
 
@@ -26,11 +28,11 @@ export const profileRouter = router({
       return statistics;
     } catch (error) {
       throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
+        code: "INTERNAL_SERVER_ERROR",
         message:
           error instanceof Error
             ? error.message
-            : 'Ошибка при получении статистики профиля',
+            : "Ошибка при получении статистики профиля",
       });
     }
   }),
@@ -49,19 +51,19 @@ export const profileRouter = router({
       try {
         if (!ctx.user) {
           throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: 'Пользователь не авторизован',
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
           });
         }
 
         return getIncorrectAnswers(ctx.user.id, input);
       } catch (error) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
+          code: "INTERNAL_SERVER_ERROR",
           message:
             error instanceof Error
               ? error.message
-              : 'Ошибка при получении неправильных ответов',
+              : "Ошибка при получении неправильных ответов",
         });
       }
     }),
@@ -79,8 +81,8 @@ export const profileRouter = router({
       try {
         if (!ctx.user) {
           throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: 'Пользователь не авторизован',
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
           });
         }
 
@@ -92,15 +94,15 @@ export const profileRouter = router({
         return {
           success: true,
           data: result,
-          message: 'Счетчик непройденных вопросов обновлен',
+          message: "Счетчик непройденных вопросов обновлен",
         };
       } catch (error) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
+          code: "INTERNAL_SERVER_ERROR",
           message:
             error instanceof Error
               ? error.message
-              : 'Ошибка при обновлении счетчика непройденных вопросов',
+              : "Ошибка при обновлении счетчика непройденных вопросов",
         });
       }
     }),
@@ -119,19 +121,19 @@ export const profileRouter = router({
       try {
         if (!ctx.user) {
           throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: 'Пользователь не авторизован',
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
           });
         }
 
         return getFavoriteQuestions(ctx.user.id, input);
       } catch (error) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
+          code: "INTERNAL_SERVER_ERROR",
           message:
             error instanceof Error
               ? error.message
-              : 'Ошибка при получении избранных вопросов',
+              : "Ошибка при получении избранных вопросов",
         });
       }
     }),
@@ -150,21 +152,77 @@ export const profileRouter = router({
       try {
         if (!ctx.user) {
           throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: 'Пользователь не авторизован',
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
           });
         }
 
         return getFavoriteTests(ctx.user.id, input);
       } catch (error) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
+          code: "INTERNAL_SERVER_ERROR",
           message:
             error instanceof Error
               ? error.message
-              : 'Ошибка при получении избранных тестов',
+              : "Ошибка при получении избранных тестов",
+        });
+      }
+    }),
+
+  /**
+   * Переключить избранное для вопроса
+   */
+  toggleFavoriteQuestion: protectedProcedure
+    .input(z.object({ questionId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        console.log(ctx.user, input);
+        if (!ctx.user) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
+          });
+        }
+
+        return await toggleFavoriteQuestion(
+          ctx.user.id.toString(),
+          input.questionId
+        );
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Ошибка при переключении избранного",
+        });
+      }
+    }),
+
+  /**
+   * Переключить избранное для теста
+   */
+  toggleFavoriteTest: protectedProcedure
+    .input(z.object({ testId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        console.log(ctx.user, input);
+        if (!ctx.user) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
+          });
+        }
+
+        return await toggleFavoriteTest(ctx.user.id.toString(), input.testId);
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Ошибка при переключении избранного",
         });
       }
     }),
 });
-

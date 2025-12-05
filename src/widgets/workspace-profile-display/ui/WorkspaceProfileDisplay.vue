@@ -28,9 +28,8 @@
           v-for="question in questions"
           :key="question.id"
           :question="question"
-          :bookmarks="bookmarks"
           @open="handleOpenQuestion"
-          @toggle-bookmark="handleToggleBookmark"
+          @toggle-bookmark="handleToggleQuestionBookmark"
         />
 
         <TestCard
@@ -38,6 +37,7 @@
           :key="test.id"
           :test="test"
           @start-test="handleStartTest"
+          @toggle-bookmark="handleToggleTestBookmark"
         />
       </div>
     </div>
@@ -65,7 +65,6 @@
 </template>
 
 <script setup lang="ts">
-import { useState } from "#app";
 import { QuestionCard } from "@entities/questions-card";
 import { TestCard } from "@entities/test-card";
 import Skeleton from "primevue/skeleton";
@@ -84,27 +83,12 @@ const {
   loadMore,
   refresh,
   loadMoreTrigger,
+  handleToggleQuestionBookmark,
+  handleToggleTestBookmark,
 } = useWorkspaceProfileDisplay();
-
-// Bookmarks для вопросов
-const bookmarks = useState<Set<number>>(
-  "workspace-question-bookmarks",
-  () => new Set()
-);
 
 const handleOpenQuestion = (id: number) => {
   navigateTo(`/workspace/questions/${id}`);
-};
-
-const handleToggleBookmark = (id: number) => {
-  const next = new Set(bookmarks.value);
-  if (next.has(id)) {
-    next.delete(id);
-  } else {
-    next.add(id);
-  }
-  bookmarks.value = next;
-  // TODO: Отправить запрос на сервер для сохранения
 };
 
 const handleStartTest = (id: number) => {
@@ -113,4 +97,3 @@ const handleStartTest = (id: number) => {
 </script>
 
 <style scoped src="../style/workspace-profile-display.css"></style>
-

@@ -1,12 +1,7 @@
-import { computed } from "vue";
 import type { Ref } from "vue";
 import type { ProfileContentFilter } from "@entities/profile-state";
-import type { ProfileFilterEmits } from "./types";
 
-export function useProfileFilter(
-  modelValue: Ref<ProfileContentFilter>,
-  emit: ProfileFilterEmits
-) {
+export function useProfileFilter(modelValue: Ref<ProfileContentFilter>) {
   const filters: Array<{
     key: ProfileContentFilter;
     label: string;
@@ -29,19 +24,13 @@ export function useProfileFilter(
     },
   ];
 
-  const isSelected = (key: ProfileContentFilter) => {
-    return modelValue.value === key;
-  };
-
   const selectFilter = (key: ProfileContentFilter) => {
+    // defineModel автоматически обработает update:modelValue
     modelValue.value = key;
-    emit("update:modelValue", key);
   };
 
   return {
     filters,
-    isSelected,
     selectFilter,
   };
 }
-

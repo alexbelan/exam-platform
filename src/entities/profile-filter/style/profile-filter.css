@@ -47,7 +47,6 @@
 .profile-filter__item--active {
   background: var(--p-purple-50, #f3e8ff);
   color: var(--p-purple-700);
-  font-weight: 600;
 }
 
 .profile-filter__item--active .profile-filter__icon {

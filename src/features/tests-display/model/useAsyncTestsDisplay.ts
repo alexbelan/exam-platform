@@ -17,8 +17,14 @@ export const useAsyncTestsDisplay = () => {
     });
   };
 
+  const toggleFavorite = async (testId: number) => {
+    return await trpc.profile.toggleFavoriteTest.mutate({
+      testId,
+    });
+  };
+
   return {
     getTests,
+    toggleFavorite,
   };
 };
-

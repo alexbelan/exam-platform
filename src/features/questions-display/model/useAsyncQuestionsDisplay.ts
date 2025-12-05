@@ -17,8 +17,14 @@ export const useAsyncQuestionsDisplay = () => {
     });
   };
 
+  const toggleFavorite = async (questionId: number) => {
+    return await trpc.profile.toggleFavoriteQuestion.mutate({
+      questionId,
+    });
+  };
+
   return {
     getQuestions,
+    toggleFavorite,
   };
 };
-

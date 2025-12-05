@@ -1,6 +1,7 @@
 import { prisma } from "../utils/prisma";
 import { hasPremiumAccess } from "../utils/subscription";
 import { generateTestQuestions as generateQuestions } from "../utils/test-generator";
+import { updateLearningStatistics } from "./statistics";
 import type { Prisma } from "@prisma/client";
 
 const TAG_INCLUDE = {
@@ -155,13 +156,32 @@ export async function getTestList(params: {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: "desc" },
-      include: TAG_INCLUDE,
+      include: {
+        ...TAG_INCLUDE,
+        favoriteTests: user
+          ? {
+              where: {
+                userId: Number(user.id),
+              },
+              select: {
+                testId: true,
+              },
+            }
+          : false,
+      },
     }),
     prisma.test.count({ where }),
   ]);
 
+  // Добавляем isFavorite к каждому тесту
+  const testsWithFavorite = tests.map((test) => ({
+    ...test,
+    isFavorite: user && test.favoriteTests && test.favoriteTests.length > 0,
+    favoriteTests: undefined, // удаляем из ответа
+  }));
+
   return {
-    tests,
+    tests: testsWithFavorite,
     pagination: {
       page,
       limit,
@@ -455,4 +475,66 @@ export async function generateTestQuestions(id: number) {
   return {
     questions, // массив ID вопросов
   };
+}
+
+/**
+ * Сохранить результаты прохождения теста
+ */
+export async function submitTestAttempt(
+  userId: number,
+  data: {
+    testId: number;
+    totalQuestions: number;
+    correctAnswers: number;
+    score: number;
+    timeSpent?: number;
+    startedAt: Date;
+    completedAt: Date;
+    questionAnswers: Array<{
+      questionId: number;
+      userAnswerIds: number[];
+      correctAnswerIds: number[];
+      isCorrect: boolean;
+      timeSpent?: number;
+    }>;
+  }
+) {
+  // Используем транзакцию для атомарности всех операций
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // 1. Создаем TestAttempt с детальными ответами
+    const attempt = await tx.testAttempt.create({
+      data: {
+        userId,
+        testId: data.testId,
+        totalQuestions: data.totalQuestions,
+        correctAnswers: data.correctAnswers,
+        score: data.score,
+        timeSpent: data.timeSpent,
+        startedAt: data.startedAt,
+        completedAt: data.completedAt,
+        status: "COMPLETED",
+        questionAnswers: {
+          create: data.questionAnswers.map((qa) => ({
+            questionId: qa.questionId,
+            userAnswerIds: qa.userAnswerIds,
+            correctAnswerIds: qa.correctAnswerIds,
+            isCorrect: qa.isCorrect,
+            timeSpent: qa.timeSpent,
+          })),
+        },
+      },
+      include: {
+        questionAnswers: true,
+      },
+    });
+
+    // 2. Обновляем общую статистику обучения
+    await updateLearningStatistics(userId, {
+      totalQuestions: data.totalQuestions,
+      correctAnswers: data.correctAnswers,
+      score: data.score,
+    });
+
+    return attempt;
+  });
 }

@@ -1,6 +1,10 @@
 <template>
   <section class="workspace-test-display">
-    <div v-if="error" class="workspace-test-display__state">
+    <div
+      v-if="error"
+      class="workspace-test-display__state workspace-test-display__state--error"
+    >
+      <i class="pi pi-exclamation-triangle" />
       <p>Не удалось загрузить тесты. Попробуйте ещё раз.</p>
       <Button
         label="Повторить попытку"
@@ -19,6 +23,7 @@
     </div>
 
     <div v-else-if="showEmptyState" class="workspace-test-display__state">
+      <i class="pi pi-inbox" />
       <p>Тесты пока не добавлены. Загляните позже.</p>
       <Button
         label="Обновить"
@@ -34,6 +39,7 @@
         :key="test.id"
         :test="test"
         @start-test="handleStartTest"
+        @toggle-bookmark="handleToggleBookmark"
       />
     </div>
   </section>
@@ -55,7 +61,7 @@ const emit = defineEmits<{
   (event: "start-test", id: number): void;
 }>();
 
-const { tests, pending, error, refresh } = useTestsDisplay({
+const { tests, pending, error, refresh, handleToggleBookmark } = useTestsDisplay({
   filters: props.filters ?? (() => ({})),
 });
 

@@ -1,4 +1,4 @@
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { useProfileStateStore } from "@entities/profile-state";
 import { useAsyncProfileFavorites } from "./useAsyncProfileFavorites";
 import type { UseProfileFavoritesReturn } from "./types";
@@ -18,16 +18,18 @@ export function useProfileFavorites(): UseProfileFavoritesReturn {
   } = useAsyncData(
     () => `profile-favorite-questions-${userId.value}`,
     async () => {
-      // Если есть данные в store, используем их и обновляем в фоне
+      // Проверяем кеш в store
+      // Если lastFetch === null, значит кеш инвалидирован и нужно загрузить заново
       if (store.hasFavoriteQuestions && store.lastFetch.favoriteQuestions) {
         const age = Date.now() - store.lastFetch.favoriteQuestions;
+        // Если данные свежие (меньше 5 минут), возвращаем из кеша
         if (age < 5 * 60 * 1000) {
-          refreshFavoriteQuestions();
           return store.favoriteQuestions;
         }
       }
 
-      const response = await getFavoriteQuestions(1, 100); // Загружаем все для кеша
+      // Загружаем новые данные с сервера
+      const response = await getFavoriteQuestions(1, 100);
       store.setFavoriteQuestions(response.questions);
       return response.questions;
     },
@@ -46,16 +48,18 @@ export function useProfileFavorites(): UseProfileFavoritesReturn {
   } = useAsyncData(
     () => `profile-favorite-tests-${userId.value}`,
     async () => {
-      // Если есть данные в store, используем их и обновляем в фоне
+      // Проверяем кеш в store
+      // Если lastFetch === null, значит кеш инвалидирован и нужно загрузить заново
       if (store.hasFavoriteTests && store.lastFetch.favoriteTests) {
         const age = Date.now() - store.lastFetch.favoriteTests;
+        // Если данные свежие (меньше 5 минут), возвращаем из кеша
         if (age < 5 * 60 * 1000) {
-          refreshFavoriteTests();
           return store.favoriteTests;
         }
       }
 
-      const response = await getFavoriteTests(1, 100); // Загружаем все для кеша
+      // Загружаем новые данные с сервера
+      const response = await getFavoriteTests(1, 100);
       store.setFavoriteTests(response.tests);
       return response.tests;
     },
@@ -65,18 +69,8 @@ export function useProfileFavorites(): UseProfileFavoritesReturn {
     }
   );
 
-  // Обновляем store при изменении данных
-  watch(favoriteQuestionsData, (newData) => {
-    if (newData) {
-      store.setFavoriteQuestions(newData);
-    }
-  });
-
-  watch(favoriteTestsData, (newData) => {
-    if (newData) {
-      store.setFavoriteTests(newData);
-    }
-  });
+  // Убираем watch, так как store уже обновляется внутри useAsyncData
+  // Это предотвращает бесконечные циклы обновлений
 
   return {
     favoriteQuestions: computed(() => favoriteQuestionsData.value || []),

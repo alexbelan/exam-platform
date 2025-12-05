@@ -1,9 +1,6 @@
 <template>
   <div class="workspace-questions-page">
-    <WorkspaceQuestionsCatalog
-      @open="handleOpen"
-      @toggle-bookmark="handleToggleBookmark"
-    />
+    <WorkspaceQuestionsCatalog @open="handleOpen" />
   </div>
 </template>
 
@@ -12,11 +9,6 @@ import { WorkspaceQuestionsCatalog } from "@widgets/workspace-questions-catalog"
 
 const handleOpen = (id: number) => {
   navigateTo(`/workspace/questions/${id}`);
-};
-
-const handleToggleBookmark = (id: number) => {
-  // Логика уже обрабатывается в виджете через useState
-  // Этот обработчик нужен только для совместимости с emit
 };
 </script>
 
@@ -29,4 +21,3 @@ const handleToggleBookmark = (id: number) => {
   height: 100%;
 }
 </style>
-

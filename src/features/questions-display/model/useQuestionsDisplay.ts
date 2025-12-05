@@ -17,11 +17,10 @@ import type {
   WorkspaceQuestion,
   WorkspaceQuestionTag,
 } from "@entities/questions-card/model/types";
+import { useToastClient } from "@shared/hooks/useToastClient";
 
 interface UseQuestionsDisplayOptions {
-  filters?:
-    | QuestionsDisplayFilters
-    | (() => QuestionsDisplayFilters);
+  filters?: QuestionsDisplayFilters | (() => QuestionsDisplayFilters);
   immediate?: boolean;
   scrollContainer?: Ref<HTMLElement | null>;
 }
@@ -54,13 +53,13 @@ function normalizeQuestion(
     description: null,
     content: null,
     tags: question.tags.map(normalizeTag),
+    isFavorite: question.isFavorite,
   };
 }
 
-export function useQuestionsDisplay(
-  options?: UseQuestionsDisplayOptions
-) {
-  const { getQuestions } = useAsyncQuestionsDisplay();
+export function useQuestionsDisplay(options?: UseQuestionsDisplayOptions) {
+  const { getQuestions, toggleFavorite } = useAsyncQuestionsDisplay();
+  const toast = useToastClient();
   const filtersSource = options?.filters;
   const filters = computed(() => {
     if (typeof filtersSource === "function") {
@@ -106,7 +105,7 @@ export function useQuestionsDisplay(
     {
       immediate: options?.immediate ?? true,
       watch: [queryParams],
-      getCachedData: (key, nuxtApp) => {
+      getCachedData: (key: string, nuxtApp: any) => {
         const cached = nuxtApp.payload.data[key];
         if (cached) {
           return cached;
@@ -124,6 +123,7 @@ export function useQuestionsDisplay(
   const loadMoreError = ref<Error | null>(null);
   const loadMoreTrigger = ref<HTMLElement | null>(null);
   const scrollContainer = options?.scrollContainer;
+  const togglingFavorite = ref(false);
 
   // Синхронизируем данные из кеша с локальным состоянием
   watch(
@@ -189,6 +189,52 @@ export function useQuestionsDisplay(
     }
   };
 
+  // Функция переключения избранного
+  const handleToggleBookmark = async (questionId: number) => {
+    if (togglingFavorite.value) return;
+
+    // Находим вопрос в массиве
+    const question = questions.value.find((q) => q.id === questionId);
+    if (!question) return;
+
+    // Оптимистичное обновление UI - меняем isFavorite напрямую
+    const wasFavorite = question.isFavorite ?? false;
+    question.isFavorite = !wasFavorite;
+
+    try {
+      togglingFavorite.value = true;
+      const result = await toggleFavorite(questionId);
+
+      // Синхронизируем с ответом сервера
+      question.isFavorite = result.isFavorite;
+
+      // Показываем уведомление
+      toast.add({
+        severity: "success",
+        summary: "Успешно",
+        detail: result.message,
+        life: 3000,
+      });
+
+      // Очищаем кеш - при следующем обращении к данным они загрузятся заново
+      // НЕ вызывает немедленную перезагрузку, только помечает кеш как устаревший
+      await clearNuxtData(cacheKey.value);
+    } catch (err) {
+      // Откатываем при ошибке
+      question.isFavorite = wasFavorite;
+
+      toast.add({
+        severity: "error",
+        summary: "Ошибка",
+        detail:
+          err instanceof Error ? err.message : "Не удалось обновить избранное",
+        life: 3000,
+      });
+    } finally {
+      togglingFavorite.value = false;
+    }
+  };
+
   // Настройка Intersection Observer для бесконечной прокрутки
   if (options?.immediate !== false) {
     onMounted(async () => {
@@ -207,7 +253,7 @@ export function useQuestionsDisplay(
           }
         },
         {
-          root: scrollContainer?.value || null,
+          root: null, // null означает viewport (вся страница)
           rootMargin: "200px",
         }
       );
@@ -235,6 +281,8 @@ export function useQuestionsDisplay(
     });
   }
 
+  console.log(questions.value);
+
   return {
     questions,
     pending,
@@ -244,5 +292,7 @@ export function useQuestionsDisplay(
     loadMoreTrigger,
     refresh,
     loadMore,
+    handleToggleBookmark,
+    isTogglingFavorite: computed(() => togglingFavorite.value),
   };
 }

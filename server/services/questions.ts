@@ -1,13 +1,13 @@
-import { prisma } from '../utils/prisma';
-import { hasPremiumAccess } from '../utils/subscription';
-import type { Prisma } from '@prisma/client';
+import { prisma } from "../utils/prisma";
+import { hasPremiumAccess } from "../utils/subscription";
+import type { Prisma } from "@prisma/client";
 
 /**
  * Получить вопрос по ID
  */
 export async function getQuestionById(
   id: number,
-  user: { role: string } | null
+  user: { id: number; role: string } | null
 ) {
   const question = await prisma.interviewQuestion.findUnique({
     where: { id },
@@ -37,20 +37,40 @@ export async function getQuestionById(
           },
         },
       },
+      // Включаем избранные вопросы с фильтрацией по userId в одном запросе
+      favoriteQuestions: user?.id
+        ? {
+            where: {
+              userId: user.id,
+            },
+            select: {
+              id: true,
+            },
+          }
+        : false,
     },
   });
 
   if (!question) {
-    throw new Error('Вопрос не найден');
+    throw new Error("Вопрос не найден");
   }
 
   // Проверка доступа: неопубликованные вопросы доступны только админам
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === "ADMIN";
   if (!question.isPublished && !isAdmin) {
-    throw new Error('Доступ запрещен');
+    throw new Error("Доступ запрещен");
   }
 
-  return question;
+  // Определяем isFavorite на основе наличия записей в favoriteQuestions
+  const isFavorite = user?.id ? question.favoriteQuestions.length > 0 : false;
+
+  // Удаляем favoriteQuestions из результата, оставляем только isFavorite
+  const { favoriteQuestions, ...questionWithoutFavorites } = question;
+
+  return {
+    ...questionWithoutFavorites,
+    isFavorite,
+  };
 }
 
 /**
@@ -64,7 +84,7 @@ export async function getQuestionList(params: {
   type?: string;
   status?: boolean;
   tags?: string[];
-  user: { role: string } | null;
+  user: { id: number; role: string } | null;
 }) {
   const {
     page = 1,
@@ -77,7 +97,7 @@ export async function getQuestionList(params: {
     user,
   } = params;
 
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === "ADMIN";
   const isPremium = user ? hasPremiumAccess(user) : false;
 
   // Построение фильтров
@@ -85,14 +105,14 @@ export async function getQuestionList(params: {
 
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { content: { contains: search, mode: 'insensitive' } },
+      { title: { contains: search, mode: "insensitive" } },
+      { content: { contains: search, mode: "insensitive" } },
     ];
   }
 
   if (tags) {
     const tagList = String(tags)
-      .split(',')
+      .split(",")
       .map((value) => value.trim())
       .filter(Boolean);
     if (tagList.length > 0) {
@@ -140,7 +160,7 @@ export async function getQuestionList(params: {
       where,
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         title: true,
@@ -168,8 +188,31 @@ export async function getQuestionList(params: {
     prisma.interviewQuestion.count({ where }),
   ]);
 
+  // Если пользователь авторизован, получаем список избранных вопросов
+  let favoriteQuestionIds: number[] = [];
+  if (user?.id) {
+    const favorites = await prisma.userFavoriteQuestion.findMany({
+      where: {
+        userId: user.id,
+        questionId: {
+          in: questions.map((q) => q.id),
+        },
+      },
+      select: {
+        questionId: true,
+      },
+    });
+    favoriteQuestionIds = favorites.map((f) => f.questionId);
+  }
+
+  // Добавляем информацию об избранном к каждому вопросу
+  const questionsWithFavorites = questions.map((question) => ({
+    ...question,
+    isFavorite: favoriteQuestionIds.includes(question.id),
+  }));
+
   return {
-    questions,
+    questions: questionsWithFavorites,
     pagination: {
       page: Number(page),
       limit: Number(limit),
@@ -199,7 +242,7 @@ export async function createQuestion(data: {
   >;
 }) {
   if (!data.title || !data.content) {
-    throw new Error('Заголовок и содержание обязательны');
+    throw new Error("Заголовок и содержание обязательны");
   }
 
   // Обработка тегов
@@ -209,9 +252,9 @@ export async function createQuestion(data: {
     for (const tag of data.tags) {
       let candidate: string | null = null;
 
-      if (typeof tag === 'string') {
+      if (typeof tag === "string") {
         candidate = tag;
-      } else if (tag && typeof tag === 'object' && 'id' in tag) {
+      } else if (tag && typeof tag === "object" && "id" in tag) {
         candidate = tag.id;
       }
 
@@ -245,7 +288,7 @@ export async function createQuestion(data: {
       content: data.content,
       isPublished: Boolean(data.isPublished),
       requiresPremium: Boolean(data.requiresPremium),
-      categoryId: data.categoryId || '',
+      categoryId: data.categoryId || "",
       tags: {
         connect: validTagIds.map((tagId) => ({ id: tagId })),
       },
@@ -274,7 +317,7 @@ export async function createQuestion(data: {
     for (const answerData of data.answers) {
       let answerId: string;
 
-      if (typeof answerData === 'string') {
+      if (typeof answerData === "string") {
         // Если это строка (ID или текст), ищем или создаем ответ
         const existingAnswer = await prisma.answer.findFirst({
           where: {
@@ -290,9 +333,9 @@ export async function createQuestion(data: {
           });
           answerId = newAnswer.id;
         }
-      } else if (typeof answerData === 'object' && answerData.id) {
+      } else if (typeof answerData === "object" && answerData.id) {
         answerId = answerData.id;
-      } else if (typeof answerData === 'object' && answerData.text) {
+      } else if (typeof answerData === "object" && answerData.text) {
         // Создаем новый ответ из текста
         const newAnswer = await prisma.answer.create({
           data: { text: answerData.text },
@@ -376,7 +419,7 @@ export async function updateQuestion(
   });
 
   if (!existingQuestion) {
-    throw new Error('Вопрос не найден');
+    throw new Error("Вопрос не найден");
   }
 
   // Подготовка данных для обновления
@@ -384,8 +427,7 @@ export async function updateQuestion(
 
   if (data.title !== undefined) updateData.title = data.title;
   if (data.content !== undefined) updateData.content = data.content;
-  if (data.isPublished !== undefined)
-    updateData.isPublished = data.isPublished;
+  if (data.isPublished !== undefined) updateData.isPublished = data.isPublished;
   if (data.requiresPremium !== undefined)
     updateData.requiresPremium = data.requiresPremium;
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
@@ -397,9 +439,9 @@ export async function updateQuestion(
     for (const tag of data.tags) {
       let candidate: string | null = null;
 
-      if (typeof tag === 'string') {
+      if (typeof tag === "string") {
         candidate = tag;
-      } else if (tag && typeof tag === 'object' && 'id' in tag) {
+      } else if (tag && typeof tag === "object" && "id" in tag) {
         candidate = tag.id;
       }
 
@@ -462,7 +504,7 @@ export async function updateQuestion(
     for (const answerData of data.answers) {
       let answerId: string;
 
-      if (typeof answerData === 'string') {
+      if (typeof answerData === "string") {
         // Если это строка (ID или текст), ищем или создаем ответ
         const existingAnswer = await prisma.answer.findFirst({
           where: {
@@ -478,9 +520,9 @@ export async function updateQuestion(
           });
           answerId = newAnswer.id;
         }
-      } else if (typeof answerData === 'object' && answerData.id) {
+      } else if (typeof answerData === "object" && answerData.id) {
         answerId = answerData.id;
-      } else if (typeof answerData === 'object' && answerData.text) {
+      } else if (typeof answerData === "object" && answerData.text) {
         // Создаем новый ответ из текста
         const newAnswer = await prisma.answer.create({
           data: { text: answerData.text },
@@ -546,7 +588,7 @@ export async function deleteQuestion(id: number) {
   });
 
   if (!existingQuestion) {
-    throw new Error('Вопрос не найден');
+    throw new Error("Вопрос не найден");
   }
 
   // Удаление вопроса
@@ -554,4 +596,3 @@ export async function deleteQuestion(id: number) {
     where: { id },
   });
 }
-

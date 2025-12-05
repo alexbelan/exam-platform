@@ -19,6 +19,7 @@ export interface QuestionsResponseQuestion {
   createdAt: string;
   updatedAt: string;
   tags: QuestionsResponseTag[];
+  isFavorite?: boolean;
 }
 
 export interface QuestionsResponse {

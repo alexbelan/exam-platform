@@ -19,16 +19,15 @@ export interface WorkspaceQuestion {
   description?: string | null;
   content?: string | null;
   tags?: WorkspaceQuestionTag[];
+  isFavorite?: boolean;
 }
 
 export interface QuestionCardLogicProps {
   question: WorkspaceQuestion;
-  bookmarks: Set<number>;
   onToggleBookmark: (id: number) => void;
   onOpen: (id: number) => void;
 }
 
 export interface QuestionCardProps {
   question: WorkspaceQuestion;
-  bookmarks: Set<number>;
 }

@@ -25,6 +25,8 @@ import { useProfilePage } from "../model/useProfilePage";
 
 const { userData, activeFilter, statisticsValue, statisticsPendingValue } =
   useProfilePage();
+
+console.log("activeFilter", activeFilter.value);
 </script>
 
 <style scoped src="../style/profile-page.css"></style>

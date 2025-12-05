@@ -4,30 +4,6 @@
   gap: 1.5rem;
   position: relative;
   z-index: 1;
-  max-height: calc(100vh - 155px);
-  overflow-y: auto;
-  overflow-x: visible;
-  scroll-behavior: smooth;
-  margin-top: -140px;
-  padding-top: 140px;
-}
-
-.workspace-questions-display::-webkit-scrollbar {
-  width: 8px;
-}
-
-.workspace-questions-display::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-.workspace-questions-display::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.workspace-questions-display::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
 }
 
 .workspace-questions-display__content {

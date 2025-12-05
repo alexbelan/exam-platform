@@ -25,6 +25,8 @@ defineProps<Props>();
   align-items: center;
   height: 5.66rem;
   box-sizing: border-box;
+  position: relative;
+  z-index: 100;
 }
 
 .header h1 {
@@ -39,6 +41,8 @@ defineProps<Props>();
   display: flex;
   gap: 1rem;
   align-items: center;
+  position: relative;
+  z-index: 101;
 }
 
 @media (max-width: 768px) {

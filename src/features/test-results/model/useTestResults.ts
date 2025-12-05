@@ -1,6 +1,6 @@
 import { computed, ref, watch } from "vue";
 import type { TestResultsProps, QuestionResult } from "./types";
-import { useTestSessionStore } from "@entities/test-session";
+import { useTestSessionStore } from "@entities/test-session-state";
 
 interface Question {
   id: number;

@@ -20,6 +20,7 @@ export interface TestsResponseTest {
   isPublished: boolean;
   tags: TestsResponseTag[];
   primaryTag?: TestsResponseTag | null;
+  isFavorite?: boolean;
 }
 
 export interface TestsResponse {

@@ -18,7 +18,7 @@ export interface WorkspaceTest {
   questionIds: number[];
   isPublished: boolean;
   tags?: WorkspaceTestTag[];
-  primaryTag?: WorkspaceTestTag | null;
+  isFavorite?: boolean;
 }
 
 export interface TestCardProps {
@@ -27,4 +27,5 @@ export interface TestCardProps {
 
 export interface TestCardLogicProps extends TestCardProps {
   onStartTest: (id: number) => void;
+  onToggleBookmark: (id: number) => void;
 }

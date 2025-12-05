@@ -224,6 +224,112 @@ select {
   color: var(--text-color-secondary, #6b7280);
 }
 
+/* Стили для PrimeVue Drawer - убираем отступы */
+.mobile-drawer .p-drawer {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.mobile-drawer .p-drawer-sidebar {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.mobile-drawer .p-drawer-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.mobile-drawer .p-drawer-header {
+  padding: 0 !important;
+  border: none !important;
+  border-bottom: none !important;
+}
+
+.mobile-drawer .p-drawer-body {
+  padding: 0 !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.mobile-drawer .p-drawer-footer {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.mobile-drawer .drawer-footer {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mobile-drawer .drawer-footer > * {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.mobile-drawer .drawer-footer .p-button {
+  width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  justify-content: flex-start !important;
+  padding: 1rem 1.5rem !important;
+}
+
+.mobile-drawer .drawer-footer button {
+  width: 100% !important;
+}
+
+.mobile-drawer .navigation-menu {
+  margin: 0 !important;
+  padding: 1rem 0 !important;
+  width: 100% !important;
+}
+
+.mobile-drawer .navigation-menu__link {
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.mobile-drawer .p-drawer-close {
+  right: 1rem;
+  top: 1.5rem;
+}
+
+/* Ensure header and menu button are always clickable */
+.header {
+  position: relative;
+  z-index: 1100 !important;
+}
+
+.header-actions {
+  position: relative;
+  z-index: 1101 !important;
+}
+
+.header-actions button,
+.header-actions .p-button {
+  position: relative;
+  z-index: 1102 !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure Drawer overlay doesn't block menu button when closed */
+.p-drawer-mask:not(.p-component-overlay-visible):not(.p-drawer-open):not(.p-overlay-mask-enter) {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   html {

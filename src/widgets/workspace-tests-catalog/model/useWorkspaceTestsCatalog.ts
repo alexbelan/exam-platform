@@ -2,7 +2,7 @@ import { computed, ref } from "vue";
 import type { WorkspaceTestsCatalogFilters } from "./types";
 
 export function useWorkspaceTestsCatalog(
-  emit: (event: "start-test", id: number) => void
+  emitStartTest: (id: number) => void
 ) {
   const search = ref("");
   const selectedTags = ref<string[]>([]);
@@ -22,8 +22,20 @@ export function useWorkspaceTestsCatalog(
     selectedTags.value = [];
   };
 
+  const handleFiltersUpdate = (newFilters: { search?: string; tags?: string[] }) => {
+    if (newFilters.search !== undefined) {
+      search.value = newFilters.search;
+    }
+    // Обрабатываем tags: если это пустой массив, очищаем selectedTags
+    if (newFilters.tags !== undefined) {
+      selectedTags.value = Array.isArray(newFilters.tags) && newFilters.tags.length === 0 
+        ? [] 
+        : newFilters.tags;
+    }
+  };
+
   const handleStartTest = (id: number) => {
-    emit("start-test", id);
+    emitStartTest(id);
   };
 
   return {
@@ -32,6 +44,7 @@ export function useWorkspaceTestsCatalog(
     filters,
     hasActiveFilters,
     resetFilters,
+    handleFiltersUpdate,
     handleStartTest,
   };
 }

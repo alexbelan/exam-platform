@@ -1,6 +1,6 @@
-import { prisma } from '../utils/prisma';
-import { getUncorrectedIncorrectAnswers } from '../utils/getUncorrectedIncorrectAnswers';
-import { updateUncorrectedQuestionsCount } from '../utils/updateUncorrectedQuestionsCount';
+import { prisma } from "../utils/prisma";
+import { getUncorrectedIncorrectAnswers } from "../utils/getUncorrectedIncorrectAnswers";
+import { updateUncorrectedQuestionsCount } from "../utils/updateUncorrectedQuestionsCount";
 
 const TAG_INCLUDE = {
   tags: {
@@ -25,7 +25,7 @@ export async function getStatistics(userId: string) {
   });
 
   if (!statistics) {
-    throw new Error('Профиль пользователя не найден');
+    throw new Error("Профиль пользователя не найден");
   }
 
   return {
@@ -108,9 +108,12 @@ export async function getFavoriteQuestions(
   const page = params.page ? Number(params.page) : 1;
   const limit = params.limit ? Number(params.limit) : 12;
 
+  // Преобразуем userId в число
+  const userIdNum = Number(userId);
+
   // Получаем избранные вопросы с пагинацией (профиль создаётся при регистрации)
   const where = {
-    userId,
+    userId: userIdNum,
   };
 
   const [favorites, total] = await Promise.all([
@@ -118,7 +121,7 @@ export async function getFavoriteQuestions(
       where,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: {
         questionId: true,
         question: {
@@ -152,8 +155,8 @@ export async function getFavoriteQuestions(
 
   // Преобразуем данные в нужный формат
   const questions = favorites
-    .map((fav) => fav.question)
-    .filter((q) => q !== null);
+    .map((fav: { questionId: number; question: any }) => fav.question)
+    .filter((q: any) => q !== null);
 
   return {
     questions,
@@ -179,9 +182,12 @@ export async function getFavoriteTests(
   const page = params.page ? Number(params.page) : 1;
   const limit = params.limit ? Number(params.limit) : 12;
 
+  // Преобразуем userId в число
+  const userIdNum = Number(userId);
+
   // Получаем избранные тесты с пагинацией (профиль создаётся при регистрации)
   const where = {
-    userId,
+    userId: userIdNum,
   };
 
   const [favorites, total] = await Promise.all([
@@ -189,7 +195,7 @@ export async function getFavoriteTests(
       where,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: {
         testId: true,
         test: {
@@ -201,7 +207,9 @@ export async function getFavoriteTests(
   ]);
 
   // Преобразуем данные в нужный формат
-  const tests = favorites.map((fav) => fav.test).filter((t) => t !== null);
+  const tests = favorites
+    .map((fav: { testId: number; test: any }) => fav.test)
+    .filter((t: any) => t !== null);
 
   return {
     tests,
@@ -214,3 +222,151 @@ export async function getFavoriteTests(
   };
 }
 
+/**
+ * Переключить статус избранного вопроса
+ */
+export async function toggleFavoriteQuestion(
+  userId: string,
+  questionId: number
+) {
+  const userIdNum = Number(userId);
+
+  console.log(
+    "toggleFavoriteQuestion - userId:",
+    userIdNum,
+    "questionId:",
+    questionId
+  );
+
+  // Проверяем существование вопроса
+  const question = await prisma.interviewQuestion.findUnique({
+    where: { id: questionId },
+  });
+
+  if (!question) {
+    throw new Error("Вопрос не найден");
+  }
+
+  // Убеждаемся, что UserProfile существует
+  let userProfile = await prisma.userProfile.findUnique({
+    where: { userId: userIdNum },
+  });
+
+  if (!userProfile) {
+    console.log("UserProfile не найден, создаем для userId:", userIdNum);
+    // Создаем профиль, если его нет (для старых пользователей)
+    try {
+      userProfile = await prisma.userProfile.create({
+        data: { userId: userIdNum },
+      });
+      console.log("UserProfile создан:", userProfile);
+    } catch (error) {
+      console.error("Ошибка при создании UserProfile:", error);
+      throw new Error("Не удалось создать профиль пользователя");
+    }
+  } else {
+    console.log("UserProfile найден:", userProfile);
+  }
+
+  // Проверяем, есть ли уже в избранном
+  const existing = await prisma.userFavoriteQuestion.findUnique({
+    where: {
+      userId_questionId: {
+        userId: userIdNum,
+        questionId,
+      },
+    },
+  });
+
+  if (existing) {
+    // Удаляем из избранного
+    await prisma.userFavoriteQuestion.delete({
+      where: {
+        userId_questionId: {
+          userId: userIdNum,
+          questionId,
+        },
+      },
+    });
+    return { isFavorite: false, message: "Вопрос удален из избранного" };
+  } else {
+    // Добавляем в избранное
+    await prisma.userFavoriteQuestion.create({
+      data: {
+        userId: userIdNum,
+        questionId,
+      },
+    });
+    return { isFavorite: true, message: "Вопрос добавлен в избранное" };
+  }
+}
+
+/**
+ * Переключить статус избранного теста
+ */
+export async function toggleFavoriteTest(userId: string, testId: number) {
+  const userIdNum = Number(userId);
+
+  console.log("toggleFavoriteTest - userId:", userIdNum, "testId:", testId);
+
+  // Проверяем существование теста
+  const test = await prisma.test.findUnique({
+    where: { id: testId },
+  });
+
+  if (!test) {
+    throw new Error("Тест не найден");
+  }
+
+  // Убеждаемся, что UserProfile существует
+  let userProfile = await prisma.userProfile.findUnique({
+    where: { userId: userIdNum },
+  });
+
+  if (!userProfile) {
+    console.log("UserProfile не найден, создаем для userId:", userIdNum);
+    try {
+      userProfile = await prisma.userProfile.create({
+        data: { userId: userIdNum },
+      });
+      console.log("UserProfile создан:", userProfile);
+    } catch (error) {
+      console.error("Ошибка при создании UserProfile:", error);
+      throw new Error("Не удалось создать профиль пользователя");
+    }
+  } else {
+    console.log("UserProfile найден:", userProfile);
+  }
+
+  // Проверяем, есть ли уже в избранном
+  const existing = await prisma.userFavoriteTest.findUnique({
+    where: {
+      userId_testId: {
+        userId: userIdNum,
+        testId: testId,
+      },
+    },
+  });
+
+  if (existing) {
+    // Удаляем из избранного
+    await prisma.userFavoriteTest.delete({
+      where: {
+        userId_testId: {
+          userId: userIdNum,
+          testId: testId,
+        },
+      },
+    });
+    return { isFavorite: false, message: "Тест удален из избранного" };
+  } else {
+    // Добавляем в избранное
+    await prisma.userFavoriteTest.create({
+      data: {
+        userId: userIdNum,
+        testId: testId,
+      },
+    });
+    return { isFavorite: true, message: "Тест добавлен в избранное" };
+  }
+}

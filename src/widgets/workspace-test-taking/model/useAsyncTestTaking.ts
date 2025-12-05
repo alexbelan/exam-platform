@@ -46,11 +46,36 @@ export const useAsyncTestTaking = (testId: string | number) => {
     };
   };
 
+  // Сохранить результаты прохождения теста
+  const submitTestAttempt = async (data: {
+    testId: number;
+    totalQuestions: number;
+    correctAnswers: number;
+    score: number;
+    timeSpent?: number;
+    startedAt: Date;
+    completedAt: Date;
+    questionAnswers: Array<{
+      questionId: number;
+      userAnswerIds: number[];
+      correctAnswerIds: number[];
+      isCorrect: boolean;
+      timeSpent?: number;
+    }>;
+  }) => {
+    const result = await trpc.tests.submitAttempt.mutate(data);
+    return {
+      success: true,
+      attempt: result.attempt,
+      message: result.message,
+    };
+  };
+
   return {
     getTestMeta,
     generateTestQuestions,
     getQuestion,
     updateUncorrectedQuestions,
+    submitTestAttempt,
   };
 };
-

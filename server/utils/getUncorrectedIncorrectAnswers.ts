@@ -12,6 +12,7 @@ interface GetUncorrectedIncorrectAnswersResult {
     isPublished: boolean;
     createdAt: Date;
     updatedAt: Date;
+    isFavorite: boolean;
     tags: Array<{
       id: number;
       name: string;
@@ -85,7 +86,7 @@ export async function getUncorrectedIncorrectAnswers(
     };
   }
 
-  // Получаем полные данные вопросов через Prisma
+  // Получаем полные данные вопросов через Prisma с проверкой избранных
   const questions = await prisma.interviewQuestion.findMany({
     where: {
       id: { in: paginatedQuestionIds },
@@ -111,11 +112,30 @@ export async function getUncorrectedIncorrectAnswers(
           },
         },
       },
+      favoriteQuestions: {
+        where: {
+          userId: userId,
+        },
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
+  // Преобразуем данные, добавляя поле isFavorite
+  const questionsWithFavorite = questions.map((q) => ({
+    id: q.id,
+    title: q.title,
+    isPublished: q.isPublished,
+    createdAt: q.createdAt,
+    updatedAt: q.updatedAt,
+    isFavorite: q.favoriteQuestions.length > 0, // Проверяем, есть ли избранное
+    tags: q.tags,
+  }));
+
   return {
-    questions,
+    questions: questionsWithFavorite,
     total,
   };
 }

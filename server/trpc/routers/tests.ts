@@ -1,10 +1,10 @@
-import { z } from 'zod';
+import { z } from "zod";
 import {
   router,
   publicProcedure,
   protectedProcedure,
   adminProcedure,
-} from '../index';
+} from "../index";
 import {
   getTestById,
   getTestList,
@@ -12,8 +12,9 @@ import {
   updateTest,
   deleteTest,
   generateTestQuestions,
-} from '../../services/tests';
-import { TRPCError } from '@trpc/server';
+  submitTestAttempt,
+} from "../../services/tests";
+import { TRPCError } from "@trpc/server";
 
 export const testsRouter = router({
   /**
@@ -27,15 +28,15 @@ export const testsRouter = router({
         return {
           success: true,
           test,
-          message: 'Данные теста получены',
+          message: "Данные теста получены",
         };
       } catch (error) {
         throw new TRPCError({
           code:
-            error instanceof Error && error.message === 'Доступ запрещен'
-              ? 'FORBIDDEN'
-              : 'NOT_FOUND',
-          message: error instanceof Error ? error.message : 'Тест не найден',
+            error instanceof Error && error.message === "Доступ запрещен"
+              ? "FORBIDDEN"
+              : "NOT_FOUND",
+          message: error instanceof Error ? error.message : "Тест не найден",
         });
       }
     }),
@@ -71,8 +72,12 @@ export const testsRouter = router({
         questionCount: z.number().min(1),
         isPublished: z.boolean().optional().default(false),
         requiresPremium: z.boolean().optional().default(false),
-        tags: z.array(z.union([z.number(), z.object({ id: z.number() })])).optional(),
-        primaryTag: z.union([z.number(), z.object({ id: z.number() }), z.null()]).optional(),
+        tags: z
+          .array(z.union([z.number(), z.object({ id: z.number() })]))
+          .optional(),
+        primaryTag: z
+          .union([z.number(), z.object({ id: z.number() }), z.null()])
+          .optional(),
         questionIds: z.array(z.number()).optional(),
       })
     )
@@ -82,13 +87,15 @@ export const testsRouter = router({
         return {
           success: true,
           test,
-          message: 'Тест создан',
+          message: "Тест создан",
         };
       } catch (error) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
+          code: "BAD_REQUEST",
           message:
-            error instanceof Error ? error.message : 'Ошибка при создании теста',
+            error instanceof Error
+              ? error.message
+              : "Ошибка при создании теста",
         });
       }
     }),
@@ -105,8 +112,12 @@ export const testsRouter = router({
         questionCount: z.number().min(1).optional(),
         isPublished: z.boolean().optional(),
         requiresPremium: z.boolean().optional(),
-        tags: z.array(z.union([z.number(), z.object({ id: z.number() })])).optional(),
-        primaryTag: z.union([z.number(), z.object({ id: z.number() }), z.null()]).optional(),
+        tags: z
+          .array(z.union([z.number(), z.object({ id: z.number() })]))
+          .optional(),
+        primaryTag: z
+          .union([z.number(), z.object({ id: z.number() }), z.null()])
+          .optional(),
         questionIds: z.array(z.number()).optional(),
       })
     )
@@ -117,13 +128,15 @@ export const testsRouter = router({
         return {
           success: true,
           test,
-          message: 'Тест обновлен',
+          message: "Тест обновлен",
         };
       } catch (error) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
+          code: "BAD_REQUEST",
           message:
-            error instanceof Error ? error.message : 'Ошибка при обновлении теста',
+            error instanceof Error
+              ? error.message
+              : "Ошибка при обновлении теста",
         });
       }
     }),
@@ -138,12 +151,12 @@ export const testsRouter = router({
         await deleteTest(input.id);
         return {
           success: true,
-          message: 'Тест удален',
+          message: "Тест удален",
         };
       } catch (error) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Ошибка при удалении теста',
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Ошибка при удалении теста",
         });
       }
     }),
@@ -159,15 +172,80 @@ export const testsRouter = router({
         return {
           success: true,
           questions: result.questions,
-          message: 'Вопросы сгенерированы',
+          message: "Вопросы сгенерированы",
         };
       } catch (error) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
+          code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error ? error.message : 'Ошибка при генерации вопросов',
+            error instanceof Error
+              ? error.message
+              : "Ошибка при генерации вопросов",
+        });
+      }
+    }),
+
+  /**
+   * Сохранить результаты прохождения теста
+   */
+  submitAttempt: protectedProcedure
+    .input(
+      z.object({
+        testId: z.number(),
+        totalQuestions: z.number().min(1),
+        correctAnswers: z.number().min(0),
+        score: z.number().min(0).max(100),
+        timeSpent: z.number().min(0).optional(),
+        startedAt: z.coerce.date(),
+        completedAt: z.coerce.date(),
+        questionAnswers: z.array(
+          z.object({
+            questionId: z.number(),
+            userAnswerIds: z.array(z.number()),
+            correctAnswerIds: z.array(z.number()),
+            isCorrect: z.boolean(),
+            timeSpent: z.number().min(0).optional(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        if (!ctx.user) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Пользователь не авторизован",
+          });
+        }
+
+        const attempt = await submitTestAttempt(Number(ctx.user.id), input);
+
+        return {
+          success: true,
+          attempt: {
+            id: attempt.id,
+            testId: attempt.testId,
+            totalQuestions: attempt.totalQuestions,
+            correctAnswers: attempt.correctAnswers,
+            score: Number(attempt.score),
+            timeSpent: attempt.timeSpent,
+            startedAt: attempt.startedAt,
+            completedAt: attempt.completedAt,
+            status: attempt.status,
+          },
+          message: "Результаты теста сохранены",
+        };
+      } catch (error) {
+        throw new TRPCError({
+          code:
+            error instanceof Error && error.message.includes("не найден")
+              ? "NOT_FOUND"
+              : "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Ошибка при сохранении результатов теста",
         });
       }
     }),
 });
-

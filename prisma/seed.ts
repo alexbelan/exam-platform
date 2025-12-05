@@ -31,6 +31,24 @@ async function main() {
     },
   });
 
+  // Создаем профиль для администратора
+  await prisma.userProfile.upsert({
+    where: { userId: admin.id },
+    update: {},
+    create: {
+      userId: admin.id,
+    },
+  });
+
+  // Создаем статистику для администратора (после создания профиля)
+  await prisma.learningStatistics.upsert({
+    where: { userId: admin.id },
+    update: {},
+    create: {
+      userId: admin.id,
+    },
+  });
+
   // Создаем обычного пользователя
   const user = await prisma.user.upsert({
     where: { email: "user@example.com" },
@@ -42,6 +60,24 @@ async function main() {
       lastName: "Doe",
       role: UserRole.USER,
       isActive: true,
+    },
+  });
+
+  // Создаем профиль для обычного пользователя
+  await prisma.userProfile.upsert({
+    where: { userId: user.id },
+    update: {},
+    create: {
+      userId: user.id,
+    },
+  });
+
+  // Создаем статистику для обычного пользователя (после создания профиля)
+  await prisma.learningStatistics.upsert({
+    where: { userId: user.id },
+    update: {},
+    create: {
+      userId: user.id,
     },
   });
 

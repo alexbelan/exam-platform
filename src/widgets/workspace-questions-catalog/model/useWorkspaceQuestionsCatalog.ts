@@ -1,17 +1,10 @@
-import { computed, ref, onBeforeUnmount } from "vue";
+import { computed, ref } from "vue";
 import type { WorkspaceQuestionsCatalogFilters } from "./types";
 
-export function useWorkspaceQuestionsCatalog(
-  emitOpen: (id: number) => void,
-  emitToggleBookmark: (id: number) => void
-) {
+export function useWorkspaceQuestionsCatalog(emitOpen: (id: number) => void) {
   const search = ref("");
   const selectedLevel = ref<string | null>(null);
   const selectedTags = ref<string[]>([]);
-  const bookmarks = useState<Set<number>>(
-    "workspace-question-bookmarks",
-    () => new Set()
-  );
 
   const filters = computed<WorkspaceQuestionsCatalogFilters>(() => ({
     search: search.value.trim() || undefined,
@@ -32,35 +25,30 @@ export function useWorkspaceQuestionsCatalog(
     selectedTags.value = [];
   };
 
+  const handleFiltersUpdate = (newFilters: { search?: string; tags?: string[] }) => {
+    if (newFilters.search !== undefined) {
+      search.value = newFilters.search;
+    }
+    // Обрабатываем tags: если это пустой массив, очищаем selectedTags
+    if (newFilters.tags !== undefined) {
+      selectedTags.value = Array.isArray(newFilters.tags) && newFilters.tags.length === 0 
+        ? [] 
+        : newFilters.tags;
+    }
+  };
+
   const handleOpen = (id: number) => {
     emitOpen(id);
   };
-
-  const handleToggleBookmark = (id: number) => {
-    if (bookmarks.value.has(id)) {
-      const next = new Set(bookmarks.value);
-      next.delete(id);
-      bookmarks.value = next;
-    } else {
-      bookmarks.value = new Set([...bookmarks.value, id]);
-    }
-    emitToggleBookmark(id);
-  };
-
-  onBeforeUnmount(() => {
-    bookmarks.value = new Set(bookmarks.value);
-  });
 
   return {
     search,
     selectedLevel,
     selectedTags,
     filters,
-    bookmarks,
     hasActiveFilters,
     resetFilters,
+    handleFiltersUpdate,
     handleOpen,
-    handleToggleBookmark,
   };
 }
-

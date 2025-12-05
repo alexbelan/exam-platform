@@ -1,7 +1,7 @@
 .action-header {
   position: sticky;
-  top: 0;
-  z-index: 10;
+  top: 30px;
+  z-index: 102;
   background: white;
   padding: 1.75rem;
   border-radius: 16px;
@@ -36,17 +36,19 @@
   flex-wrap: wrap;
 }
 
-.action-header__search {
-  width: 280px;
+.action-header__filters-button {
+  display: none;
 }
 
 @media (max-width: 768px) {
   .action-header {
     flex-direction: column;
+    top: 10px;
   }
 
-  .action-header__search {
+  .action-header__filters-button {
+    display: flex;
     width: 100%;
+    justify-content: center;
   }
 }
-

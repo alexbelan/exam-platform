@@ -1,5 +1,5 @@
 <template>
-  <section ref="scrollContainer" class="workspace-questions-display">
+  <section class="workspace-questions-display">
     <div
       v-if="error"
       class="workspace-questions-display__state workspace-questions-display__state--error"
@@ -39,7 +39,6 @@
           v-for="question in questions"
           :key="question.id"
           :question="question"
-          :bookmarks="bookmarks"
           @open="handleOpen"
           @toggle-bookmark="handleToggleBookmark"
         />
@@ -50,11 +49,17 @@
         ref="loadMoreTrigger"
         class="workspace-questions-display__load-more"
       >
-        <div v-if="loadingMore" class="workspace-questions-display__loading-more">
+        <div
+          v-if="loadingMore"
+          class="workspace-questions-display__loading-more"
+        >
           <ProgressSpinner strokeWidth="4" />
           <span>Загружаем еще вопросы...</span>
         </div>
-        <div v-else-if="hasMore" class="workspace-questions-display__load-more-hint">
+        <div
+          v-else-if="hasMore"
+          class="workspace-questions-display__load-more-hint"
+        >
           <i class="pi pi-arrow-down" />
           <span>Прокрутите вниз для загрузки</span>
         </div>
@@ -87,19 +92,13 @@ interface QuestionsDisplayProps {
         level?: string;
         tags?: string[];
       });
-  bookmarks?: Set<number>;
 }
 
-const props = withDefaults(defineProps<QuestionsDisplayProps>(), {
-  bookmarks: () => new Set<number>(),
-});
+const props = defineProps<QuestionsDisplayProps>();
 
 const emit = defineEmits<{
   (event: "open", id: number): void;
-  (event: "toggle-bookmark", id: number): void;
 }>();
-
-const scrollContainer = ref<HTMLElement | null>(null);
 
 const {
   questions,
@@ -109,10 +108,15 @@ const {
   hasMore,
   loadMoreTrigger,
   refresh,
+  handleToggleBookmark,
 } = useQuestionsDisplay({
-  filters: () => props.filters ?? {},
+  filters: () => {
+    if (typeof props.filters === "function") {
+      return props.filters();
+    }
+    return props.filters ?? {};
+  },
   immediate: true,
-  scrollContainer,
 });
 
 const showEmptyState = computed(
@@ -121,8 +125,6 @@ const showEmptyState = computed(
 
 const handleRefresh = () => refresh();
 const handleOpen = (id: number) => emit("open", id);
-const handleToggleBookmark = (id: number) => emit("toggle-bookmark", id);
 </script>
 
 <style scoped src="../style/workspace-questions-display.css"></style>
-

@@ -14,4 +14,6 @@ export interface UseWorkspaceProfileDisplayReturn {
   loadMore: () => Promise<void>;
   refresh: () => Promise<void>;
   loadMoreTrigger: Ref<HTMLElement | null>;
+  handleToggleQuestionBookmark: (questionId: number) => Promise<void>;
+  handleToggleTestBookmark: (testId: number) => Promise<void>;
 }

@@ -132,6 +132,12 @@ db-seed: ## Заполнить базу тестовыми данными
 	@echo "$(GREEN)Заполняем базу тестовыми данными...$(RESET)"
 	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose exec app bunx prisma db seed
 
+db-seed-interview-questions: ## Заполнить базу вопросами для интервью
+	@echo "$(GREEN)Генерируем Prisma Client...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose exec app bunx prisma generate
+	@echo "$(GREEN)Заполняем базу вопросами для интервью...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose exec app bun run prisma/seed-interview-questions.ts
+
 restart: ## Перезапустить контейнеры
 	@echo "$(YELLOW)Перезапускаем контейнеры...$(RESET)"
 	$(MAKE) stop

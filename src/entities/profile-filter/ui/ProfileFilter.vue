@@ -12,7 +12,7 @@
           type="button"
           :class="[
             'profile-filter__item',
-            { 'profile-filter__item--active': isSelected(filter.key) },
+            { 'profile-filter__item--active': modelValue === filter.key },
           ]"
           @click="selectFilter(filter.key)"
         >
@@ -28,19 +28,12 @@
 import Card from "primevue/card";
 import type { ProfileContentFilter } from "@entities/profile-state";
 import { useProfileFilter } from "../model/useProfileFilter";
-import type { ProfileFilterEmits } from "../model/types";
 
 const modelValue = defineModel<ProfileContentFilter>({
   default: "favorite-questions",
 });
 
-const emit = defineEmits<ProfileFilterEmits>();
-
-const { filters, isSelected, selectFilter } = useProfileFilter(
-  modelValue,
-  emit
-);
+const { filters, selectFilter } = useProfileFilter(modelValue);
 </script>
 
 <style scoped src="../style/profile-filter.css"></style>
-
