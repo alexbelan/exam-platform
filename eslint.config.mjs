@@ -10,6 +10,30 @@ export default withNuxt([
           allow: ["error", "warn"],
         },
       ],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@entities/*/model/*",
+                "@entities/*/ui/*",
+                "@entities/*/style/*",
+                "@features/*/model/*",
+                "@features/*/ui/*",
+                "@features/*/style/*",
+                "@pages/*/model/*",
+                "@pages/*/ui/*",
+                "@shared/*/hooks/*",
+                "@shared/*/ui/*",
+                "@shared/*/utils/*",
+              ],
+              message:
+                "Используйте Public API (index.ts) для импорта. Например: '@entities/questions-card' вместо '@entities/questions-card/model/types'",
+            },
+          ],
+        },
+      ],
       "no-restricted-syntax": [
         "warn",
         {

@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
-import type { WorkspaceQuestion } from "@entities/questions-card/model/types";
-import type { WorkspaceTest } from "@entities/test-card/model/types";
+import type { WorkspaceQuestion } from "@entities/questions-card";
+import type { WorkspaceTest } from "@entities/test-card";
 import type { ProfileContentFilter } from "@entities/profile-state";
 import type { RouterOutputs } from "#shared/types/trpc";
 

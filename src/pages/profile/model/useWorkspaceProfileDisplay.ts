@@ -2,9 +2,9 @@ import { computed, ref, watch, onBeforeUnmount, nextTick, type Ref } from "vue";
 import { useProfileStateStore } from "@entities/profile-state";
 import { useProfileFavorites } from "@features/profile-favorites";
 import { useAsyncWorkspaceProfileDisplay } from "./useAsyncWorkspaceProfileDisplay";
-import { useAsyncQuestionsDisplay } from "@features/questions-display/model/useAsyncQuestionsDisplay";
-import { useAsyncTestsDisplay } from "@features/tests-display/model/useAsyncTestsDisplay";
-import { useToastClient } from "@shared/hooks/useToastClient";
+import { useAsyncQuestionsDisplay } from "@features/questions-display";
+import { useAsyncTestsDisplay } from "@features/tests-display";
+import { useToastClient } from "@shared/hooks";
 import type {
   UseWorkspaceProfileDisplayReturn,
   FavoriteQuestionRaw,
@@ -13,11 +13,8 @@ import type {
 import type {
   WorkspaceQuestion,
   WorkspaceQuestionTag,
-} from "@entities/questions-card/model/types";
-import type {
-  WorkspaceTest,
-  WorkspaceTestTag,
-} from "@entities/test-card/model/types";
+} from "@entities/questions-card";
+import type { WorkspaceTest, WorkspaceTestTag } from "@entities/test-card";
 
 export function useWorkspaceProfileDisplay(): UseWorkspaceProfileDisplayReturn {
   let loadMoreTriggerRef: Ref<HTMLElement | null> | null = null;
