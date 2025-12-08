@@ -1,10 +1,10 @@
 <template>
   <Dialog
     :visible="props.visible"
-    @update:visible="$emit('update:visible', $event)"
     :header="`Заявка: ${props.submission?.title}`"
     :modal="true"
     :style="{ width: '800px' }"
+    @update:visible="$emit('update:visible', $event)"
   >
     <div v-if="props.submission" class="submission-details">
       <div class="submission-header">
@@ -21,7 +21,7 @@
             >
             <span
               ><strong>Дата:</strong>
-              {{ formatDate(props.submission.createdAt) }}</span
+              {{ formatDate(props.submission.createdAt, "short") }}</span
             >
             <span
               ><strong>Статус:</strong>
@@ -73,11 +73,8 @@
 
 <script setup lang="ts">
 import Tag from "primevue/tag";
-import {
-  formatDate,
-  getStatusLabel,
-  getStatusSeverity,
-} from "@features/submissions-table";
+import { formatDate } from "@shared/utils";
+import { getStatusLabel, getStatusSeverity } from "@features/submissions-table";
 import type {
   SubmissionModalProps,
   SubmissionModalEmits,

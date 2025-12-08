@@ -1,12 +1,45 @@
 <template>
   <div class="admin-users-page">
-    <AdminUsersCatalog
-      ref="catalogRef"
-      @create="handleCreate"
-      @view="handleView"
-      @edit="handleEdit"
-      @delete="handleDelete"
-    />
+    <div class="admin-users-catalog">
+      <div class="page-header">
+        <h1>Управление пользователями</h1>
+        <div class="header-actions">
+          <Button
+            label="Добавить пользователя"
+            icon="pi pi-plus"
+            @click="handleCreate"
+          />
+          <Button
+            label="Экспорт"
+            icon="pi pi-download"
+            severity="secondary"
+            @click="exportUsers"
+          />
+        </div>
+      </div>
+
+      <UsersFilters
+        :model-value="{
+          search: filters.search,
+          role: filters.role,
+          status: filters.status,
+          subscription: filters.subscription,
+        }"
+        @update:model-value="handleFiltersUpdate"
+        @reset="handleFiltersReset"
+      />
+
+      <UsersTable
+        :users="users"
+        :pagination="pagination"
+        :loading="loading"
+        :subscription-filter="filters.subscription"
+        @view="handleView"
+        @edit="handleEdit"
+        @delete="handleDelete"
+        @page-change="handlePageChange"
+      />
+    </div>
 
     <UserFormModal
       v-model:visible="showAddUserModal"
@@ -17,12 +50,31 @@
 </template>
 
 <script setup lang="ts">
-import { AdminUsersCatalog } from "@widgets/admin-users-catalog";
+import { UsersFilters } from "@features/users-filters";
+import { UsersTable } from "@features/users-table";
 import { UserFormModal } from "@entities/user";
+import { useAdminUsersCatalog } from "../model/useAdminUsersCatalog";
 import { useAdminUsersPage } from "../model/useAdminUsersPage";
 import type { User } from "@features/users-table";
 
-const catalogRef = ref<InstanceType<typeof AdminUsersCatalog> | null>(null);
+const emit = defineEmits<{
+  (event: "create"): void;
+  (event: "view" | "edit" | "delete", user: User): void;
+}>();
+
+const {
+  filters,
+  users,
+  pagination,
+  loading,
+  handleView: handleViewCatalog,
+  handleDelete: handleDeleteCatalog,
+  handleFiltersUpdate,
+  handleFiltersReset,
+  exportUsers,
+  handlePageChange,
+  refresh,
+} = useAdminUsersCatalog(emit);
 
 const {
   showAddUserModal,
@@ -37,7 +89,7 @@ const handleCreate = () => {
 };
 
 const handleView = (user: User) => {
-  // Логика уже обрабатывается в виджете
+  handleViewCatalog(user);
 };
 
 const handleEdit = (user: User) => {
@@ -45,14 +97,12 @@ const handleEdit = (user: User) => {
 };
 
 const handleDelete = (user: User) => {
-  // Логика уже обрабатывается в виджете
+  handleDeleteCatalog(user);
 };
 
 const handleUserSaved = async () => {
   closeModal();
-  if (catalogRef.value) {
-    await catalogRef.value.refresh();
-  }
+  await refresh();
 };
 </script>
 
@@ -66,3 +116,4 @@ const handleUserSaved = async () => {
 }
 </style>
 
+<style scoped src="../style/admin-users-catalog.css"></style>

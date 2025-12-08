@@ -10,6 +10,7 @@ model User {
   // Email авторизация (для админов)
   email              String?          @unique
   password           String?
+  emailVerified      Boolean          @default(false)
   // Общие поля
   firstName          String?
   lastName           String?
@@ -59,6 +60,20 @@ model Payment {
   @@map("payments")
 }
 
+model Token {
+  id        Int       @id @default(autoincrement())
+  token     String
+  type      TokenType
+  data      Json      // Дополнительные данные токена (например, userId, email)
+  expiresAt DateTime
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([token, type])
+  @@map("tokens")
+}
+
 enum UserRole {
   USER
   ADMIN
@@ -95,5 +110,12 @@ enum SubmissionStatus {
   APPROVED
   REJECTED
   NEEDS_REVISION
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION_REGISTRATION
+  EMAIL_VERIFICATION_LOGIN
+  PASSWORD_RESET
+  EMAIL_CHANGE
 }
 

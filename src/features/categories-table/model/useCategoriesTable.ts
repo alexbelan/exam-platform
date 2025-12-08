@@ -2,26 +2,18 @@ import { computed, watch, type Ref } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
 import { normalizeHex } from "@shared/utils/color";
+import { extractErrorMessage } from "@shared/utils";
 import { TAG_CATEGORY_DEFAULT_COLOR } from "@features/category-modal/model/useCategoryModal";
 import type { TableColumn, PageEvent } from "@shared/ui/Table";
-import type {
-  CategoryTableItem,
-  CategoriesTableFilters,
-} from "./types";
+import type { CategoryTableItem, CategoriesTableFilters } from "./types";
 import type { CategoryEntity } from "@entities/category";
-
-const extractErrorMessage = (error: any, fallback: string) =>
-  error?.data?.statusMessage ||
-  error?.statusMessage ||
-  error?.message ||
-  fallback;
 
 export const getCategoryColor = (category?: CategoryEntity | null) =>
   normalizeHex(category?.color) || TAG_CATEGORY_DEFAULT_COLOR;
 
 export function useCategoriesTable(
   filters: Ref<CategoriesTableFilters>,
-  onPageChange: (event: { page: number; rows: number }) => void
+  onPageChange: (event: { page: number; rows: number }) => void,
 ) {
   const toast = useToastClient();
 
@@ -31,7 +23,7 @@ export function useCategoriesTable(
   }));
 
   const cacheKey = computed(
-    () => `admin-tag-categories-${JSON.stringify(queryParams.value)}`
+    () => `admin-tag-categories-${JSON.stringify(queryParams.value)}`,
   );
 
   const {
@@ -53,8 +45,8 @@ export function useCategoriesTable(
           name: category.name,
           slug: category.slug,
           color: category.color,
-          tagCount: (category as any)._count?.tags ?? 0,
-        })
+          tagCount: ("_count" in category ? category._count?.tags : 0) ?? 0,
+        }),
       );
 
       return {
@@ -72,7 +64,7 @@ export function useCategoriesTable(
         }
         return undefined;
       },
-    }
+    },
   );
 
   const categories = computed(() => categoriesData.value?.categories ?? []);
@@ -83,7 +75,7 @@ export function useCategoriesTable(
         limit: 10,
         total: 0,
         pages: 0,
-      }
+      },
   );
 
   watch(error, (err) => {
@@ -135,4 +127,3 @@ export function useCategoriesTable(
     cacheKey,
   };
 }
-

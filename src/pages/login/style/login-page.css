@@ -38,3 +38,35 @@
   width: 100%;
 }
 
+.mode-switcher {
+  margin-bottom: 1rem;
+}
+
+.mode-switcher .p-buttonset {
+  display: flex;
+  gap: 0;
+  width: 100%;
+}
+
+.mode-switcher .p-buttonset button {
+  flex: 1;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.forgot-password-link {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.forgot-password-link a {
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--p-primary-color);
+}
+
+.forgot-password-link a:hover {
+  text-decoration: underline;
+}

@@ -11,9 +11,20 @@ export const useAsyncLogin = () => {
     return result;
   };
 
+  const sendLoginCode = async (email: string) => {
+    const result = await trpc.auth.sendLoginCode.mutate({ email });
+    return result;
+  };
+
+  const verifyLoginCode = async (email: string, code: string) => {
+    const result = await trpc.auth.verifyLoginCode.mutate({ email, code });
+    return result;
+  };
+
   return {
     loginWithTelegram,
     loginWithEmail,
+    sendLoginCode,
+    verifyLoginCode,
   };
 };
-

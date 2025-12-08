@@ -7,8 +7,8 @@
     lazy
     :first="(props.pagination.page - 1) * props.pagination.limit"
     :rows="props.pagination.limit"
-    :totalRecords="props.pagination.total"
-    :rowsPerPageOptions="[5, 10, 25]"
+    :total-records="props.pagination.total"
+    :rows-per-page-options="[5, 10, 25]"
     @page="handlePageChange"
   >
     <!-- Кастомная отрисовка ID -->
@@ -19,14 +19,10 @@
     <!-- Кастомная отрисовка заголовка с тегами -->
     <template #column-title="{ data }">
       <div class="question-title">
-        <a
-          href="#"
-          class="title-text"
-          @click.prevent="$emit('view', data)"
-        >
+        <a href="#" class="title-text" @click.prevent="$emit('view', data)">
           {{ data.title }}
         </a>
-        <div class="question-tags" v-if="data.tags && data.tags.length > 0">
+        <div v-if="data.tags && data.tags.length > 0" class="question-tags">
           <Tag
             v-for="tag in data.tags"
             :key="tag.id"
@@ -47,35 +43,35 @@
     </template>
 
     <template #column-createdAt="{ value }">
-      {{ formatDate(value as string) }}
+      {{ formatDate(value as string, "short") }}
     </template>
 
     <template #actions="{ data }">
       <div class="action-buttons">
         <Button
+          v-tooltip.top="'Просмотр и редактирование'"
           icon="pi pi-eye"
           severity="info"
           text
           rounded
-          v-tooltip.top="'Просмотр и редактирование'"
           @click="$emit('view', data)"
         />
         <Button
+          v-tooltip.top="
+            data.isPublished ? 'Снять с публикации' : 'Опубликовать'
+          "
           :icon="data.isPublished ? 'pi pi-eye-slash' : 'pi pi-eye'"
           :severity="data.isPublished ? 'warning' : 'success'"
           text
           rounded
-          v-tooltip.top="
-            data.isPublished ? 'Снять с публикации' : 'Опубликовать'
-          "
           @click="$emit('toggle-publish', data)"
         />
         <Button
+          v-tooltip.top="'Удалить'"
           icon="pi pi-trash"
           severity="danger"
           text
           rounded
-          v-tooltip.top="'Удалить'"
           @click="$emit('delete', data)"
         />
       </div>
@@ -87,7 +83,8 @@
 import Tag from "primevue/tag";
 import { Table } from "@shared/ui";
 import type { PageEvent } from "@shared/ui/Table";
-import { getTagStyles, formatDate } from "../model/useQuestionsTable";
+import { getTagStyles } from "../model/useQuestionsTable";
+import { formatDate } from "@shared/utils";
 import type { QuestionsTableProps, QuestionsTableEmits } from "../model/types";
 
 const props = defineProps<QuestionsTableProps>();
@@ -99,4 +96,3 @@ const handlePageChange = (event: PageEvent) => {
 </script>
 
 <style scoped src="../style/admin-questions-table.css"></style>
-

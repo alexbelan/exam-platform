@@ -1,11 +1,42 @@
 <template>
   <div class="admin-tags-page">
-    <AdminTagsCatalog
-      ref="catalogRef"
-      @create="handleCreate"
-      @edit="handleEdit"
-      @delete="handleDelete"
-    />
+    <div class="admin-tags-catalog">
+      <div class="page-header">
+        <h1>Управление тегами</h1>
+        <div class="header-actions">
+          <Button
+            label="Добавить тег"
+            icon="pi pi-plus"
+            @click="handleCreate"
+          />
+          <Button
+            label="Обновить"
+            icon="pi pi-refresh"
+            severity="secondary"
+            :loading="loading"
+            @click="refreshData"
+          />
+        </div>
+      </div>
+
+      <TagsFilters
+        :model-value="filtersForComponent"
+        :categories="categories"
+        :categories-loading="categoriesLoading"
+        @update:model-value="handleFiltersUpdate"
+        @reset="handleFiltersReset"
+      />
+
+      <TagsTable
+        :tags="tags"
+        :pagination="pagination"
+        :loading="loading"
+        :columns="columns"
+        @edit="handleEdit"
+        @delete="handleDelete"
+        @page-change="handlePageChange"
+      />
+    </div>
 
     <TagModal
       :visible="tagModal.visible"
@@ -20,21 +51,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { AdminTagsCatalog } from "@widgets/admin-tags-catalog";
+import { TagsFilters } from "@features/tags-filters";
+import { TagsTable } from "@features/tags-table";
 import { TagModal } from "@features/tag-modal";
+import { useAdminTagsCatalog } from "../model/useAdminTagsCatalog";
 import { useAdminTagsPage } from "../model/useAdminTagsPage";
 import type { Tag } from "@features/tags-table";
 
-const catalogRef = ref<InstanceType<typeof AdminTagsCatalog> | null>(null);
+const emit = defineEmits<{
+  (event: "create"): void;
+  (event: "edit" | "delete", tag: Tag): void;
+}>();
+
+const {
+  filtersForComponent,
+  tags,
+  pagination,
+  loading,
+  columns,
+  categories,
+  categoriesLoading,
+  categoryOptions,
+  handlePageChange,
+  handleFiltersUpdate,
+  handleFiltersReset,
+  handleDelete: handleDeleteCatalog,
+  refreshData,
+} = useAdminTagsCatalog(emit);
 
 const { tagModal, openTagModal, closeTagModal, handleTagModalSave } =
   useAdminTagsPage();
-
-const categoryOptions = computed(() => {
-  // Получаем категории из виджета через ref
-  return catalogRef.value?.categoryOptions || [];
-});
 
 const handleCreate = () => {
   openTagModal(null, categoryOptions.value);
@@ -45,18 +91,17 @@ const handleEdit = (tag: Tag) => {
 };
 
 const handleDelete = (tag: Tag) => {
-  // Логика уже обрабатывается в виджете
+  handleDeleteCatalog(tag);
 };
 
-// Обработчик успешного сохранения - обновляем данные в каталоге
 const handleTagModalSaveWrapper = async (payload: {
   id?: number;
   name: string;
   categoryId: number;
 }) => {
   const success = await handleTagModalSave(payload);
-  if (success && catalogRef.value) {
-    await catalogRef.value.refreshData();
+  if (success) {
+    await refreshData();
   }
 };
 </script>
@@ -71,3 +116,4 @@ const handleTagModalSaveWrapper = async (payload: {
 }
 </style>
 
+<style scoped src="../style/admin-tags-catalog.css"></style>

@@ -1,13 +1,13 @@
 <template>
   <Button
     v-if="hasActiveFilters"
+    v-tooltip.top="tooltip || 'Сбросить все фильтры'"
     icon="pi pi-filter-slash"
     severity="secondary"
     text
     rounded
-    v-tooltip.top="tooltip || 'Сбросить все фильтры'"
-    @click="$emit('reset')"
     class="filter-reset-button"
+    @click="$emit('reset')"
   />
 </template>
 
@@ -26,4 +26,3 @@ defineEmits<{
   flex-shrink: 0;
 }
 </style>
-

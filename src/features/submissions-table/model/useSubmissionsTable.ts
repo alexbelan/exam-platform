@@ -1,9 +1,3 @@
-import type { Submission } from "./types";
-
-export const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat("ru-RU").format(date);
-};
-
 export const truncateText = (text: string, length: number) => {
   return text.length > length ? text.substring(0, length) + "..." : text;
 };
@@ -27,4 +21,3 @@ export const getStatusSeverity = (status: string) => {
   };
   return severities[status] || "info";
 };
-

@@ -7,18 +7,19 @@
 
     <InputNumber
       v-if="isNumberInput"
-      :modelValue="numberModelValue"
-      @update:modelValue="updateNumberValue"
+      :model-value="numberModelValue"
       v-bind="inputAttrs"
       class="form-input"
+      @update:model-value="updateNumberValue"
     />
     <InputText
       v-else
       :id="textInputId"
-      :modelValue="textModelValue"
-      @update:modelValue="updateTextValue"
+      :model-value="textModelValue"
+      :type="props.type"
       v-bind="inputAttrs"
       class="form-input"
+      @update:model-value="updateTextValue"
     />
 
     <small v-if="props.error" class="p-error">{{ props.error }}</small>
@@ -30,7 +31,7 @@ import { computed, useAttrs } from "vue";
 import InputText from "primevue/inputtext";
 import InputNumber from "primevue/inputnumber";
 
-type InputType = "text" | "number";
+type InputType = "text" | "number" | "email";
 
 interface Props {
   modelValue?: string | number | null;
@@ -82,7 +83,7 @@ const numberModelValue = computed(() => {
 });
 
 const textModelValue = computed(() =>
-  props.modelValue != null ? String(props.modelValue) : ""
+  props.modelValue != null ? String(props.modelValue) : "",
 );
 
 const textInputId = computed(() => (attrs.id as string) || undefined);

@@ -7,25 +7,34 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // Хешируем пароли используя Bun.password API (bcrypt для совместимости)
-  const adminPassword = await Bun.password.hash("admin123", {
-    algorithm: "bcrypt",
-    cost: 10,
-  });
-  const userPassword = await Bun.password.hash("user123", {
+  // Получаем данные администратора из переменных окружения
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
+  const adminPasswordPlain = process.env.ADMIN_PASSWORD || "admin123";
+  const adminFirstName = process.env.ADMIN_FIRST_NAME || "Admin";
+  const adminLastName = process.env.ADMIN_LAST_NAME || "User";
+
+  // Хешируем пароль администратора используя Bun.password API (bcrypt для совместимости)
+  const adminPassword = await Bun.password.hash(adminPasswordPlain, {
     algorithm: "bcrypt",
     cost: 10,
   });
 
   // Создаем администратора
   const admin = await prisma.user.upsert({
-    where: { email: "admin@example.com" },
-    update: {},
+    where: { email: adminEmail },
+    update: {
+      firstName: adminFirstName,
+      lastName: adminLastName,
+      role: UserRole.ADMIN,
+      isActive: true,
+      // Обновляем пароль только если он указан в env
+      ...(process.env.ADMIN_PASSWORD && { password: adminPassword }),
+    },
     create: {
-      email: "admin@example.com",
+      email: adminEmail,
       password: adminPassword,
-      firstName: "Admin",
-      lastName: "User",
+      firstName: adminFirstName,
+      lastName: adminLastName,
       role: UserRole.ADMIN,
       isActive: true,
     },
@@ -49,185 +58,8 @@ async function main() {
     },
   });
 
-  // Создаем обычного пользователя
-  const user = await prisma.user.upsert({
-    where: { email: "user@example.com" },
-    update: {},
-    create: {
-      email: "user@example.com",
-      password: userPassword,
-      firstName: "John",
-      lastName: "Doe",
-      role: UserRole.USER,
-      isActive: true,
-    },
-  });
-
-  // Создаем профиль для обычного пользователя
-  await prisma.userProfile.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: {
-      userId: user.id,
-    },
-  });
-
-  // Создаем статистику для обычного пользователя (после создания профиля)
-  await prisma.learningStatistics.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: {
-      userId: user.id,
-    },
-  });
-
-  // Создаем категории тегов
-  const tagCategories = await Promise.all([
-    prisma.category.upsert({
-      where: { slug: "frontend" },
-      update: {
-        name: "Frontend",
-        color: "#3b82f6",
-      },
-      create: {
-        name: "Frontend",
-        slug: "frontend",
-        color: "#3b82f6",
-      },
-    }),
-    prisma.category.upsert({
-      where: { slug: "backend" },
-      update: {
-        name: "Backend",
-        color: "#6366f1",
-      },
-      create: {
-        name: "Backend",
-        slug: "backend",
-        color: "#6366f1",
-      },
-    }),
-    prisma.category.upsert({
-      where: { slug: "theory" },
-      update: {
-        name: "Theory",
-        color: "#10b981",
-      },
-      create: {
-        name: "Theory",
-        slug: "theory",
-        color: "#10b981",
-      },
-    }),
-  ]);
-
-  const categoryBySlug = Object.fromEntries(
-    tagCategories.map((category) => [category.slug, category])
-  );
-
-  // Создаем базовые теги
-  const tags = await Promise.all([
-    prisma.tag.upsert({
-      where: { slug: "javascript" },
-      update: {
-        name: "JavaScript",
-        category: {
-          connect: { id: categoryBySlug["frontend"].id },
-        },
-      },
-      create: {
-        name: "JavaScript",
-        slug: "javascript",
-        category: {
-          connect: { id: categoryBySlug["frontend"].id },
-        },
-      },
-    }),
-    prisma.tag.upsert({
-      where: { slug: "react" },
-      update: {
-        name: "React",
-        category: {
-          connect: { id: categoryBySlug["frontend"].id },
-        },
-      },
-      create: {
-        name: "React",
-        slug: "react",
-        category: {
-          connect: { id: categoryBySlug["frontend"].id },
-        },
-      },
-    }),
-    prisma.tag.upsert({
-      where: { slug: "algorithms" },
-      update: {
-        name: "Algorithms",
-        category: {
-          connect: { id: categoryBySlug["theory"].id },
-        },
-      },
-      create: {
-        name: "Algorithms",
-        slug: "algorithms",
-        category: {
-          connect: { id: categoryBySlug["theory"].id },
-        },
-      },
-    }),
-    prisma.tag.upsert({
-      where: { slug: "system-design" },
-      update: {
-        name: "System Design",
-        category: {
-          connect: { id: categoryBySlug["backend"].id },
-        },
-      },
-      create: {
-        name: "System Design",
-        slug: "system-design",
-        category: {
-          connect: { id: categoryBySlug["backend"].id },
-        },
-      },
-    }),
-  ]);
-
-  // Создаем тестовый вопрос
-  const question = await prisma.interviewQuestion.create({
-    data: {
-      title: "Что такое замыкания в JavaScript?",
-      content:
-        "Объясните концепцию замыканий в JavaScript. Приведите пример использования.",
-      isPublished: true,
-      categoryId: categoryBySlug["frontend"].id,
-      tags: {
-        connect: [{ slug: "javascript" }],
-      },
-    },
-  });
-
-  // Создаем тестовое предложение пользователя
-  await prisma.userSubmission.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1,
-      title: "Вопрос о TypeScript",
-      content: "Как работают дженерики в TypeScript?",
-      status: "PENDING",
-      userId: user.id,
-    },
-  });
-
   console.log("✅ Database seeded successfully!");
-  console.log(`👤 Admin: ${admin.email} (password: admin123)`);
-  console.log(`👤 User: ${user.email} (password: user123)`);
-  console.log(
-    `🏷️  Created ${tags.length} tags in ${tagCategories.length} categories`
-  );
-  console.log(`❓ Created 1 test question`);
-  console.log(`📝 Created 1 test submission`);
+  console.log(`👤 Admin: ${admin.email} (password: ${adminPasswordPlain})`);
 }
 
 main()

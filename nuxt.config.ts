@@ -12,30 +12,24 @@ export default defineNuxtConfig({
   dir: {
     pages: "routes",
   },
-
-  // Настройка Vite для правильного разрешения алиасов FSD-слоев
   vite: {
     resolve: {
       alias: {
         "@shared": resolve(rootDir, "src/shared"),
         "@entities": resolve(rootDir, "src/entities"),
         "@features": resolve(rootDir, "src/features"),
-        "@widgets": resolve(rootDir, "src/widgets"),
         "@pages": resolve(rootDir, "src/pages"),
       },
     },
   },
 
-  // Алиасы для Nuxt (для SSR и сборки)
   alias: {
     "@shared": resolve(rootDir, "src/shared"),
     "@entities": resolve(rootDir, "src/entities"),
     "@features": resolve(rootDir, "src/features"),
-    "@widgets": resolve(rootDir, "src/widgets"),
     "@pages": resolve(rootDir, "src/pages"),
   },
 
-  // Для Docker нужно слушать на всех интерфейсах
   devServer: {
     host: "0.0.0.0",
     port: 3000,
@@ -46,8 +40,12 @@ export default defineNuxtConfig({
       routes: ["/", "/login"],
       crawlLinks: true,
     },
+    scheduledTasks: {
+      "0 */12 * * *": ["token-cleanup"],
+    },
   },
   ssr: true,
+
   // Настройка для SPA-рендеринга админских страниц
   router: {
     options: {
@@ -73,44 +71,28 @@ export default defineNuxtConfig({
     "quill/dist/quill.snow.css",
     "highlight.js/styles/atom-one-dark.css",
   ],
-  // Обновляем пути к компонентам
-  components: [
-    {
-      path: "@shared/ui",
-      global: true,
-      prefix: "Shared",
-      ignore: ["**/index.ts"],
-    },
-    // {
-    //   path: "~/entities",
-    //   global: true,
-    //   prefix: "Entity",
-    //   ignore: ["**/index.ts"],
-    // },
-    // {
-    //   path: "~/features",
-    //   global: true,
-    //   prefix: "Feature",
-    //   ignore: ["**/index.ts"],
-    // },
-    // Страницы (pages) не должны быть глобальными компонентами
-    // Они используются через роутинг Nuxt
-  ],
   runtimeConfig: {
     databaseUrl: process.env.DATABASE_URL,
-    // Telegram конфигурация (только на сервере)
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
     telegramChannelId: process.env.TELEGRAM_CHANNEL_ID,
     telegramChannelUsername: process.env.TELEGRAM_CHANNEL_USERNAME,
+    smtpHost: process.env.SMTP_HOST,
+    smtpPort: process.env.SMTP_PORT,
+    smtpSecure: process.env.SMTP_SECURE === "true",
+    smtpUser: process.env.SMTP_USER,
+    smtpPassword: process.env.SMTP_PASSWORD,
+    smtpFrom: process.env.SMTP_FROM,
+    smtpFromName: process.env.SMTP_FROM_NAME,
+    companyName: process.env.COMPANY_NAME,
     session: {
       password:
         process.env.NUXT_SESSION_PASSWORD ||
         "default-session-password-change-in-production",
       cookie: {
         sameSite: "lax",
-        secure: false, // для разработки
+        secure: process.env.NODE_ENV === "production",
         httpOnly: true,
-        maxAge: 60 * 60 * 24 * 7, // 1 неделя
+        maxAge: 60 * 60 * 24 * 30, // 1 месяц
       },
     },
     public: {

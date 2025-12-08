@@ -1,10 +1,7 @@
 <template>
   <div class="telegram-login">
     <div v-if="!isSubscribed" class="subscription-warning">
-      <i
-        class="pi pi-exclamation-triangle"
-        style="margin-right: 0.5rem"
-      ></i>
+      <i class="pi pi-exclamation-triangle" style="margin-right: 0.5rem" />
       <p>Для доступа необходимо подписаться на канал</p>
       <Button
         label="Подписаться на канал"
@@ -28,12 +25,8 @@
 import Button from "primevue/button";
 import { useTelegramLogin } from "../model/useTelegramLogin";
 
-const {
-  loading,
-  isSubscribed,
-  openChannel,
-  handleTelegramLogin,
-} = useTelegramLogin();
+const { loading, isSubscribed, openChannel, handleTelegramLogin } =
+  useTelegramLogin();
 </script>
 
 <style scoped>
@@ -55,4 +48,3 @@ const {
   width: 100%;
 }
 </style>
-

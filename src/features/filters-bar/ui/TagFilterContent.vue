@@ -1,9 +1,12 @@
 <template>
   <div class="filters-bar__tag-filter">
     <h3 class="filters-bar__tag-filter-title">Фильтр по тегам</h3>
-    
+
     <TagFilterSkeleton v-if="pending" />
-    <div v-else-if="error" class="filters-bar__tag-filter-state filters-bar__tag-filter-state--error">
+    <div
+      v-else-if="error"
+      class="filters-bar__tag-filter-state filters-bar__tag-filter-state--error"
+    >
       <i class="pi pi-exclamation-triangle" />
       <span>Не удалось загрузить теги</span>
     </div>
@@ -22,13 +25,14 @@
           class="filters-bar__tag-filter-category-header"
           @click="toggleCategory(group.key)"
         >
-          <span class="filters-bar__tag-filter-category-name">{{ group.name }}</span>
+          <span class="filters-bar__tag-filter-category-name">{{
+            group.name
+          }}</span>
           <i
             class="pi pi-angle-right filters-bar__tag-filter-category-icon"
             :class="{
-              'filters-bar__tag-filter-category-icon--expanded': isCategoryExpanded(
-                group.key
-              ),
+              'filters-bar__tag-filter-category-icon--expanded':
+                isCategoryExpanded(group.key),
             }"
           />
         </button>
@@ -43,10 +47,12 @@
               :key="tag.id"
               :class="[
                 'filters-bar__tag-filter-tag',
-                { 'filters-bar__tag-filter-tag--selected': isSelected(tag.slug) },
+                {
+                  'filters-bar__tag-filter-tag--selected': isSelected(tag.slug),
+                },
               ]"
               :color="getTagColor(tag, isSelected(tag.slug))"
-              :backgroundOpacity="0.16"
+              :background-opacity="0.16"
               role="button"
               tabindex="0"
               @click="toggleTag(tag.slug)"
@@ -85,4 +91,3 @@ const {
 </script>
 
 <style scoped src="../style/tag-filter-content.css"></style>
-

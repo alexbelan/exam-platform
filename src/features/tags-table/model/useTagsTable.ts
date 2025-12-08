@@ -3,8 +3,9 @@ import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
 import type { TableColumn, PageEvent } from "@shared/ui/Table";
 import { normalizeHex, getContrastColor } from "@shared/utils/color";
+import { extractErrorMessage } from "@shared/utils";
 import { TAG_CATEGORY_DEFAULT_COLOR } from "@features/category-modal/model/useCategoryModal";
-import type { Tag, TagsTableFilters, TagUtils } from "./types";
+import type { Tag, TagsTableFilters } from "./types";
 import type { CategoryEntity } from "@entities/category";
 
 const getCategoryColor = (category?: CategoryEntity | null) =>
@@ -14,7 +15,7 @@ export const getTagColor = (tag: Tag) =>
   normalizeHex(tag.category?.color || "") || TAG_CATEGORY_DEFAULT_COLOR;
 
 export const getTagChipStyle = (
-  category?: CategoryEntity | null
+  category?: CategoryEntity | null,
 ): Record<string, string> => {
   const color = getCategoryColor(category);
   return {
@@ -24,15 +25,9 @@ export const getTagChipStyle = (
   };
 };
 
-const extractErrorMessage = (error: any, fallback: string) =>
-  error?.data?.statusMessage ||
-  error?.statusMessage ||
-  error?.message ||
-  fallback;
-
 export function useTagsTable(
   filters: Ref<TagsTableFilters>,
-  onPageChange: (event: { page: number; rows: number }) => void
+  onPageChange: (event: { page: number; rows: number }) => void,
 ) {
   const toast = useToastClient();
 
@@ -44,7 +39,7 @@ export function useTagsTable(
   }));
 
   const cacheKey = computed(
-    () => `admin-tags-${JSON.stringify(queryParams.value)}`
+    () => `admin-tags-${JSON.stringify(queryParams.value)}`,
   );
 
   const {
@@ -77,7 +72,7 @@ export function useTagsTable(
         }
         return undefined;
       },
-    }
+    },
   );
 
   const tags = computed(() => tagsData.value?.tags ?? []);
@@ -88,7 +83,7 @@ export function useTagsTable(
         limit: 10,
         total: 0,
         pages: 0,
-      }
+      },
   );
 
   watch(error, (err) => {

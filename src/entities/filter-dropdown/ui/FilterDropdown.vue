@@ -3,13 +3,13 @@
     <label v-if="label" class="filter-dropdown__label">{{ label }}</label>
     <Dropdown
       :model-value="modelValue"
-      @update:model-value="$emit('update:modelValue', $event)"
       :options="options"
-      :optionLabel="optionLabel"
-      :optionValue="optionValue"
+      :option-label="optionLabel"
+      :option-value="optionValue"
       :placeholder="placeholder"
       :loading="loading"
       class="filter-dropdown__select"
+      @update:model-value="$emit('update:modelValue', $event)"
     />
   </div>
 </template>
@@ -20,7 +20,7 @@ import type { FilterDropdownProps } from "../model/types";
 
 defineProps<FilterDropdownProps>();
 defineEmits<{
-  (event: "update:modelValue", value: any): void;
+  (event: "update:modelValue", value: string | number | boolean | null): void;
 }>();
 </script>
 
@@ -41,4 +41,3 @@ defineEmits<{
   width: 100%;
 }
 </style>
-

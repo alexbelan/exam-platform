@@ -148,6 +148,10 @@ prisma/           # Схемы базы данных и миграции
 
 Создайте файл `.env` на основе `.env.example` и настройте следующие переменные:
 
+- `ADMIN_EMAIL` — email администратора для seed (по умолчанию: `admin@example.com`)
+- `ADMIN_PASSWORD` — пароль администратора для seed (по умолчанию: `admin123`)
+- `ADMIN_FIRST_NAME` — имя администратора (по умолчанию: `Admin`)
+- `ADMIN_LAST_NAME` — фамилия администратора (по умолчанию: `User`)
 - `APP_NAME` — имя приложения для Docker контейнеров (по умолчанию: `test-platform`)
 - `DATABASE_URL` — строка подключения к PostgreSQL
 - `POSTGRES_USER` — пользователь базы данных

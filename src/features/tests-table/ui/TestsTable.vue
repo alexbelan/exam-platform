@@ -7,8 +7,8 @@
     lazy
     :first="(props.pagination.page - 1) * props.pagination.limit"
     :rows="props.pagination.limit"
-    :totalRecords="props.pagination.total"
-    :rowsPerPageOptions="[5, 10, 25]"
+    :total-records="props.pagination.total"
+    :rows-per-page-options="[5, 10, 25]"
     @page="handlePageChange"
   >
     <template #column-name="{ data }">
@@ -22,7 +22,7 @@
     </template>
 
     <template #column-tags="{ data }">
-      <div class="setting-tags" v-if="data.tags?.length">
+      <div v-if="data.tags?.length" class="setting-tags">
         <Tag
           v-for="tag in data.tags"
           :key="tag.id"
@@ -35,25 +35,25 @@
     </template>
 
     <template #column-createdAt="{ value }">
-      {{ formatDate(value as string) }}
+      {{ formatDate(value as string, "date") }}
     </template>
 
     <template #actions="{ data }">
       <div class="action-buttons">
         <Button
+          v-tooltip.top="'Редактировать'"
           icon="pi pi-pencil"
           severity="info"
           text
           rounded
-          v-tooltip.top="'Редактировать'"
           @click="$emit('edit', data)"
         />
         <Button
+          v-tooltip.top="'Удалить'"
           icon="pi pi-trash"
           severity="danger"
           text
           rounded
-          v-tooltip.top="'Удалить'"
           @click="$emit('delete', data)"
         />
       </div>
@@ -69,7 +69,7 @@
 import Tag from "primevue/tag";
 import { Table } from "@shared/ui";
 import type { PageEvent } from "@shared/ui/Table";
-import { formatDate } from "../model/useTestsTable";
+import { formatDate } from "@shared/utils";
 import type { TestsTableProps, TestsTableEmits } from "../model/types";
 
 const props = defineProps<TestsTableProps>();
@@ -81,4 +81,3 @@ const handlePageChange = (event: PageEvent) => {
 </script>
 
 <style scoped src="../style/admin-tests-table.css"></style>
-

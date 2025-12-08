@@ -88,7 +88,9 @@
 
 .filters-bar__tag-filter-tag {
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
   outline: none;
 }
 
@@ -125,4 +127,3 @@
   opacity: 1;
   max-height: 500px;
 }
-

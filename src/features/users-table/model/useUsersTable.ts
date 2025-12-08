@@ -3,10 +3,6 @@ import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
 import type { User, UsersTableFilters } from "./types";
 
-export const formatDate = (dateString: string) => {
-  return new Intl.DateTimeFormat("ru-RU").format(new Date(dateString));
-};
-
 export const getSubscriptionLabel = (user: User): string => {
   if (user.isLifetimeAccess || user.subscriptionType === "LIFETIME") {
     return "Пожизненный";
@@ -46,10 +42,7 @@ export const getSubscriptionSeverity = (user: User): string => {
   return "secondary"; // Бесплатный
 };
 
-export function useUsersTable(
-  filters: Ref<UsersTableFilters>,
-  onPageChange: (event: { page: number; rows: number }) => void
-) {
+export function useUsersTable(filters: Ref<UsersTableFilters>) {
   const toast = useToastClient();
 
   const queryParams = computed(() => ({
@@ -57,11 +50,12 @@ export function useUsersTable(
     limit: filters.value.limit,
     search: filters.value.search?.trim() || undefined,
     role: filters.value.role || undefined,
-    status: filters.value.status !== undefined ? filters.value.status : undefined,
+    status:
+      filters.value.status !== undefined ? filters.value.status : undefined,
   }));
 
   const cacheKey = computed(
-    () => `admin-users-${JSON.stringify(queryParams.value)}`
+    () => `admin-users-${JSON.stringify(queryParams.value)}`,
   );
 
   const {
@@ -95,7 +89,7 @@ export function useUsersTable(
         }
         return undefined;
       },
-    }
+    },
   );
 
   const users = computed(() => usersData.value?.users ?? []);
@@ -106,7 +100,7 @@ export function useUsersTable(
         limit: 10,
         total: 0,
         pages: 0,
-      }
+      },
   );
 
   watch(error, (err) => {
@@ -133,4 +127,3 @@ export function useUsersTable(
     cacheKey,
   };
 }
-

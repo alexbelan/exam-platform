@@ -15,6 +15,69 @@ const TAG_INCLUDE = {
   },
 } as const;
 
+// Types for favorite questions
+interface QuestionTagCategory {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+}
+
+interface QuestionTag {
+  id: number;
+  name: string;
+  slug: string;
+  category: QuestionTagCategory | null;
+}
+
+interface FavoriteQuestion {
+  id: number;
+  title: string;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  tags: QuestionTag[];
+}
+
+interface UserFavoriteQuestionItem {
+  questionId: number;
+  question: FavoriteQuestion | null;
+}
+
+// Types for favorite tests
+interface TestTagCategory {
+  id: number;
+  name: string;
+  slug: string;
+  color: string;
+}
+
+interface TestTag {
+  id: number;
+  name: string;
+  slug: string;
+  category: TestTagCategory | null;
+}
+
+interface FavoriteTest {
+  id: number;
+  name: string;
+  description: string | null;
+  questionCount: number;
+  questionIds: number[];
+  isPublished: boolean;
+  requiresPremium: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  tags: TestTag[];
+  primaryTag: TestTag | null;
+}
+
+interface UserFavoriteTestItem {
+  testId: number;
+  test: FavoriteTest | null;
+}
+
 /**
  * Получить статистику обучения
  */
@@ -47,7 +110,7 @@ export async function getIncorrectAnswers(
   params: {
     page?: number;
     limit?: number;
-  }
+  },
 ) {
   const page = params.page ? Number(params.page) : 1;
   const limit = params.limit ? Number(params.limit) : 12;
@@ -58,7 +121,7 @@ export async function getIncorrectAnswers(
     {
       page,
       limit,
-    }
+    },
   );
 
   return {
@@ -77,7 +140,7 @@ export async function getIncorrectAnswers(
  */
 export async function updateUncorrectedQuestions(
   userId: string,
-  questionIds: number[]
+  questionIds: number[],
 ) {
   // Нормализуем и валидируем ID вопросов
   const normalizedQuestionIds = questionIds
@@ -103,7 +166,7 @@ export async function getFavoriteQuestions(
   params: {
     page?: number;
     limit?: number;
-  }
+  },
 ) {
   const page = params.page ? Number(params.page) : 1;
   const limit = params.limit ? Number(params.limit) : 12;
@@ -153,10 +216,9 @@ export async function getFavoriteQuestions(
     prisma.userFavoriteQuestion.count({ where }),
   ]);
 
-  // Преобразуем данные в нужный формат
   const questions = favorites
-    .map((fav: { questionId: number; question: any }) => fav.question)
-    .filter((q: any) => q !== null);
+    .map((fav: UserFavoriteQuestionItem) => fav.question)
+    .filter((q: FavoriteQuestion | null): q is FavoriteQuestion => q !== null);
 
   return {
     questions,
@@ -177,7 +239,7 @@ export async function getFavoriteTests(
   params: {
     page?: number;
     limit?: number;
-  }
+  },
 ) {
   const page = params.page ? Number(params.page) : 1;
   const limit = params.limit ? Number(params.limit) : 12;
@@ -208,8 +270,8 @@ export async function getFavoriteTests(
 
   // Преобразуем данные в нужный формат
   const tests = favorites
-    .map((fav: { testId: number; test: any }) => fav.test)
-    .filter((t: any) => t !== null);
+    .map((fav: UserFavoriteTestItem) => fav.test)
+    .filter((t: FavoriteTest | null): t is FavoriteTest => t !== null);
 
   return {
     tests,
@@ -222,23 +284,12 @@ export async function getFavoriteTests(
   };
 }
 
-/**
- * Переключить статус избранного вопроса
- */
 export async function toggleFavoriteQuestion(
   userId: string,
-  questionId: number
+  questionId: number,
 ) {
   const userIdNum = Number(userId);
 
-  console.log(
-    "toggleFavoriteQuestion - userId:",
-    userIdNum,
-    "questionId:",
-    questionId
-  );
-
-  // Проверяем существование вопроса
   const question = await prisma.interviewQuestion.findUnique({
     where: { id: questionId },
   });
@@ -247,25 +298,21 @@ export async function toggleFavoriteQuestion(
     throw new Error("Вопрос не найден");
   }
 
-  // Убеждаемся, что UserProfile существует
   let userProfile = await prisma.userProfile.findUnique({
     where: { userId: userIdNum },
   });
 
   if (!userProfile) {
-    console.log("UserProfile не найден, создаем для userId:", userIdNum);
-    // Создаем профиль, если его нет (для старых пользователей)
     try {
       userProfile = await prisma.userProfile.create({
         data: { userId: userIdNum },
       });
-      console.log("UserProfile создан:", userProfile);
     } catch (error) {
       console.error("Ошибка при создании UserProfile:", error);
       throw new Error("Не удалось создать профиль пользователя");
     }
   } else {
-    console.log("UserProfile найден:", userProfile);
+    console.warn("UserProfile найден:", userProfile);
   }
 
   // Проверяем, есть ли уже в избранном
@@ -279,7 +326,6 @@ export async function toggleFavoriteQuestion(
   });
 
   if (existing) {
-    // Удаляем из избранного
     await prisma.userFavoriteQuestion.delete({
       where: {
         userId_questionId: {
@@ -290,7 +336,6 @@ export async function toggleFavoriteQuestion(
     });
     return { isFavorite: false, message: "Вопрос удален из избранного" };
   } else {
-    // Добавляем в избранное
     await prisma.userFavoriteQuestion.create({
       data: {
         userId: userIdNum,
@@ -301,15 +346,9 @@ export async function toggleFavoriteQuestion(
   }
 }
 
-/**
- * Переключить статус избранного теста
- */
 export async function toggleFavoriteTest(userId: string, testId: number) {
   const userIdNum = Number(userId);
 
-  console.log("toggleFavoriteTest - userId:", userIdNum, "testId:", testId);
-
-  // Проверяем существование теста
   const test = await prisma.test.findUnique({
     where: { id: testId },
   });
@@ -324,18 +363,16 @@ export async function toggleFavoriteTest(userId: string, testId: number) {
   });
 
   if (!userProfile) {
-    console.log("UserProfile не найден, создаем для userId:", userIdNum);
     try {
       userProfile = await prisma.userProfile.create({
         data: { userId: userIdNum },
       });
-      console.log("UserProfile создан:", userProfile);
     } catch (error) {
       console.error("Ошибка при создании UserProfile:", error);
       throw new Error("Не удалось создать профиль пользователя");
     }
   } else {
-    console.log("UserProfile найден:", userProfile);
+    console.warn("UserProfile найден:", userProfile);
   }
 
   // Проверяем, есть ли уже в избранном

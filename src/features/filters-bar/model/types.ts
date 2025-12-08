@@ -13,4 +13,3 @@ export interface FiltersBarEmits {
   (event: "update:modelValue", value: FiltersBarFilters): void;
   (event: "reset"): void;
 }
-

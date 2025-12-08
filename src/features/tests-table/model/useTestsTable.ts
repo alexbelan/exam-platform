@@ -2,23 +2,12 @@ import { computed, watch, type Ref } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
 import type { TableColumn, PageEvent } from "@shared/ui/Table";
-import type {
-  Test,
-  TestsTableFilters,
-} from "./types";
+import type { Test, TestsTableFilters } from "./types";
 import type { TestTagOption } from "@features/test-modal";
-
-export const formatDate = (date: string) => {
-  return new Intl.DateTimeFormat("ru-RU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(date));
-};
 
 export function useTestsTable(
   filters: Ref<TestsTableFilters>,
-  onPageChange: (event: { page: number; rows: number }) => void
+  onPageChange: (event: { page: number; rows: number }) => void,
 ) {
   const toast = useToastClient();
 
@@ -29,7 +18,7 @@ export function useTestsTable(
   }));
 
   const cacheKey = computed(
-    () => `admin-tests-${JSON.stringify(queryParams.value)}`
+    () => `admin-tests-${JSON.stringify(queryParams.value)}`,
   );
 
   const {
@@ -79,7 +68,7 @@ export function useTestsTable(
         }
         return undefined;
       },
-    }
+    },
   );
 
   const tests = computed(() => testsData.value?.tests ?? []);
@@ -90,7 +79,7 @@ export function useTestsTable(
         limit: 10,
         total: 0,
         pages: 0,
-      }
+      },
   );
 
   watch(error, (err) => {
@@ -140,4 +129,3 @@ export function useTestsTable(
     cacheKey,
   };
 }
-

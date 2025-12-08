@@ -3,9 +3,9 @@
     <label v-if="label" class="filter-search__label">{{ label }}</label>
     <InputText
       :model-value="modelValue"
-      @update:model-value="$emit('update:modelValue', $event)"
       :placeholder="placeholder"
       class="filter-search__input"
+      @update:model-value="$emit('update:modelValue', $event)"
     />
   </div>
 </template>
@@ -37,4 +37,3 @@ defineEmits<{
   width: 100%;
 }
 </style>
-

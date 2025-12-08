@@ -9,7 +9,7 @@ export async function updateLearningStatistics(
     totalQuestions: number;
     correctAnswers: number;
     score: number;
-  }
+  },
 ) {
   // Получаем статистику (она всегда должна существовать, т.к. создается при регистрации)
   const statistics = await prisma.learningStatistics.findUnique({

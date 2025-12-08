@@ -1,16 +1,16 @@
 <template>
   <div class="submissions-table">
     <DataTable
+      v-model:selection="selectedSubmissions"
       :value="props.submissions"
       :loading="props.loading"
       paginator
       :rows="10"
-      :rowsPerPageOptions="[5, 10, 25]"
+      :rows-per-page-options="[5, 10, 25]"
       class="p-datatable-sm"
-      selectionMode="multiple"
-      v-model:selection="selectedSubmissions"
+      selection-mode="multiple"
     >
-      <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+      <Column selection-mode="multiple" header-style="width: 3rem" />
       <Column field="title" header="Заголовок" sortable>
         <template #body="{ data }">
           <div class="submission-title">
@@ -41,7 +41,7 @@
       </Column>
       <Column field="createdAt" header="Дата подачи" sortable>
         <template #body="{ data }">
-          {{ formatDate(data.createdAt) }}
+          {{ formatDate(data.createdAt, "short") }}
         </template>
       </Column>
       <Column header="Действия">
@@ -89,8 +89,16 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Tag from "primevue/tag";
 import { computed } from "vue";
-import { formatDate, truncateText, getStatusLabel, getStatusSeverity } from "../model/useSubmissionsTable";
-import type { SubmissionsTableProps, SubmissionsTableEmits, Submission } from "../model/types";
+import { formatDate } from "@shared/utils";
+import {
+  truncateText,
+  getStatusLabel,
+  getStatusSeverity,
+} from "../model/useSubmissionsTable";
+import type {
+  SubmissionsTableProps,
+  SubmissionsTableEmits,
+} from "../model/types";
 
 const props = defineProps<SubmissionsTableProps>();
 const emit = defineEmits<SubmissionsTableEmits>();
@@ -102,4 +110,3 @@ const selectedSubmissions = computed({
 </script>
 
 <style scoped src="../style/admin-submissions-table.css"></style>
-

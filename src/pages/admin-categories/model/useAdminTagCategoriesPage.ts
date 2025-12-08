@@ -1,13 +1,8 @@
 import { reactive } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
+import { extractErrorMessage } from "@shared/utils";
 import type { CategoryTableItem } from "@features/categories-table";
-
-const extractErrorMessage = (error: any, fallback: string) =>
-  error?.data?.statusMessage ||
-  error?.statusMessage ||
-  error?.message ||
-  fallback;
 
 export function useAdminTagCategoriesPage() {
   const toast = useToastClient();
@@ -75,4 +70,3 @@ export function useAdminTagCategoriesPage() {
     handleModalSave,
   };
 }
-

@@ -1,15 +1,9 @@
 import { reactive } from "vue";
 import { useToastClient } from "@shared/hooks/useToastClient";
 import { trpc } from "#shared/lib/trpc";
+import { extractErrorMessage } from "@shared/utils";
 import type { Tag } from "@features/tags-table";
 import type { CategoryEntity } from "@entities/category";
-import { TagModal } from "@features/tag-modal";
-
-const extractErrorMessage = (error: any, fallback: string) =>
-  error?.data?.statusMessage ||
-  error?.statusMessage ||
-  error?.message ||
-  fallback;
 
 export function useAdminTagsPage() {
   const toast = useToastClient();
@@ -21,7 +15,10 @@ export function useAdminTagsPage() {
     categories: [] as CategoryEntity[],
   });
 
-  const openTagModal = (tag?: Tag | null, categories: CategoryEntity[] = []) => {
+  const openTagModal = (
+    tag?: Tag | null,
+    categories: CategoryEntity[] = [],
+  ) => {
     tagModal.tag = tag ?? null;
     tagModal.categories = categories;
     tagModal.visible = true;
@@ -93,4 +90,3 @@ export function useAdminTagsPage() {
     handleTagModalSave,
   };
 }
-

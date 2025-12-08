@@ -3,4 +3,3 @@ export interface MobileMenuProps {
   header?: string;
   position?: "left" | "right" | "top" | "bottom";
 }
-

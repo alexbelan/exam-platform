@@ -1,10 +1,10 @@
 export interface FilterDropdownOption {
   label: string;
-  value: any;
+  value: string | number | boolean | null;
 }
 
 export interface FilterDropdownProps {
-  modelValue: any;
+  modelValue: string | number | boolean | null;
   label?: string;
   placeholder?: string;
   options: FilterDropdownOption[];
@@ -12,4 +12,3 @@ export interface FilterDropdownProps {
   optionValue?: string;
   loading?: boolean;
 }
-

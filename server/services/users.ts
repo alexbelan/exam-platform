@@ -1,5 +1,6 @@
-import { prisma } from '../utils/prisma';
-import { hashPasswordBun } from '../utils/password';
+import { prisma } from "../utils/prisma";
+import { hashPasswordBun } from "../utils/password";
+import type { Prisma, UserRole } from "@prisma/client";
 
 /**
  * Получить список пользователей
@@ -8,19 +9,18 @@ export async function getUserList(params: {
   page?: number;
   limit?: number;
   search?: string;
-  role?: string;
+  role?: UserRole;
   status?: boolean;
 }) {
   const { page = 1, limit = 10, search, role, status } = params;
 
-  // Построение фильтров
-  const where: any = {};
+  const where: Prisma.UserWhereInput = {};
 
   if (search) {
     where.OR = [
-      { firstName: { contains: search, mode: 'insensitive' } },
-      { lastName: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
+      { firstName: { contains: search, mode: "insensitive" } },
+      { lastName: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
     ];
   }
 
@@ -38,7 +38,7 @@ export async function getUserList(params: {
       where,
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         email: true,
@@ -91,7 +91,7 @@ export async function getUserById(id: string) {
           status: true,
           createdAt: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       },
       _count: {
         select: {
@@ -102,7 +102,7 @@ export async function getUserById(id: string) {
   });
 
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new Error("Пользователь не найден");
   }
 
   return user;
@@ -118,19 +118,21 @@ export async function createUser(data: {
   password: string;
   role?: string;
   isActive?: boolean;
+  emailVerified?: boolean;
 }) {
   const {
     firstName,
     lastName,
     email,
     password,
-    role = 'USER',
+    role = "USER",
     isActive = true,
+    emailVerified = false,
   } = data;
 
   // Валидация обязательных полей
   if (!email || !password) {
-    throw new Error('Email и пароль обязательны');
+    throw new Error("Email и пароль обязательны");
   }
 
   // Проверка существования пользователя
@@ -139,7 +141,7 @@ export async function createUser(data: {
   });
 
   if (existingUser) {
-    throw new Error('Пользователь с таким email уже существует');
+    throw new Error("Пользователь с таким email уже существует");
   }
 
   // Хеширование пароля
@@ -154,6 +156,7 @@ export async function createUser(data: {
       password: hashedPassword,
       role,
       isActive,
+      emailVerified,
     },
     select: {
       id: true,
@@ -192,7 +195,7 @@ export async function updateUser(
     password?: string;
     role?: string;
     isActive?: boolean;
-  }
+  },
 ) {
   // Проверка существования пользователя
   const existingUser = await prisma.user.findUnique({
@@ -200,7 +203,7 @@ export async function updateUser(
   });
 
   if (!existingUser) {
-    throw new Error('Пользователь не найден');
+    throw new Error("Пользователь не найден");
   }
 
   // Проверка уникальности email (если изменился)
@@ -210,16 +213,16 @@ export async function updateUser(
     });
 
     if (emailExists) {
-      throw new Error('Пользователь с таким email уже существует');
+      throw new Error("Пользователь с таким email уже существует");
     }
   }
 
   // Подготовка данных для обновления
-  const updateData: any = {
+  const updateData: Prisma.UserUpdateInput = {
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
-    role: data.role,
+    role: data.role as UserRole,
     isActive: data.isActive,
   };
 
@@ -255,7 +258,7 @@ export async function deleteUser(id: string) {
   });
 
   if (!existingUser) {
-    throw new Error('Пользователь не найден');
+    throw new Error("Пользователь не найден");
   }
 
   // Удаление пользователя (каскадное удаление submissions)
@@ -264,3 +267,77 @@ export async function deleteUser(id: string) {
   });
 }
 
+/**
+ * Пометить email пользователя как верифицированный
+ */
+export async function verifyUserEmail(userId: string): Promise<void> {
+  // Проверка существования пользователя
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("Пользователь не найден");
+  }
+
+  if (!user.email) {
+    throw new Error("У пользователя нет email для верификации");
+  }
+
+  // Обновляем статус верификации email
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      emailVerified: true,
+    },
+  });
+}
+
+/**
+ * Привязать email и пароль к существующему пользователю
+ */
+export async function linkEmailToUser(
+  userId: string,
+  email: string,
+  password: string,
+): Promise<void> {
+  if (!email || !password) {
+    throw new Error("Email и пароль обязательны");
+  }
+
+  // Проверка существования пользователя
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("Пользователь не найден");
+  }
+
+  // Проверяем, что у пользователя еще нет email
+  if (user.email) {
+    throw new Error("У пользователя уже есть email");
+  }
+
+  // Проверяем, что email не занят другим пользователем
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    throw new Error("Email уже занят другим пользователем");
+  }
+
+  // Хешируем пароль
+  const hashedPassword = await hashPasswordBun(password);
+
+  // Обновляем пользователя: добавляем email и пароль, устанавливаем emailVerified: true
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      email,
+      password: hashedPassword,
+      emailVerified: true,
+    },
+  });
+}

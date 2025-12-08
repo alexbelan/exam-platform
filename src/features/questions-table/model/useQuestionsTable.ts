@@ -16,13 +16,9 @@ export const getTagStyles = (tag: Tag) => {
   };
 };
 
-export const formatDate = (dateString: string) => {
-  return new Intl.DateTimeFormat("ru-RU").format(new Date(dateString));
-};
-
 export function useQuestionsTable(
   filters: Ref<QuestionsTableFilters>,
-  onPageChange: (event: { page: number; rows: number }) => void
+  onPageChange: (event: { page: number; rows: number }) => void,
 ) {
   const toast = useToastClient();
 
@@ -35,7 +31,7 @@ export function useQuestionsTable(
   }));
 
   const cacheKey = computed(
-    () => `admin-questions-${JSON.stringify(queryParams.value)}`
+    () => `admin-questions-${JSON.stringify(queryParams.value)}`,
   );
 
   const {
@@ -68,7 +64,7 @@ export function useQuestionsTable(
         }
         return undefined;
       },
-    }
+    },
   );
 
   const questions = computed(() => questionsData.value?.questions ?? []);
@@ -79,7 +75,7 @@ export function useQuestionsTable(
         limit: 10,
         total: 0,
         pages: 0,
-      }
+      },
   );
 
   watch(error, (err) => {

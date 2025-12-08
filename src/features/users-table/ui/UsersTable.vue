@@ -5,10 +5,10 @@
       :loading="props.loading"
       paginator
       :rows="props.pagination.limit"
-      :totalRecords="props.pagination.total"
-      :rowsPerPageOptions="[5, 10, 25]"
-      @page="handlePageChange"
+      :total-records="props.pagination.total"
+      :rows-per-page-options="[5, 10, 25]"
       class="p-datatable-sm"
+      @page="handlePageChange"
     >
       <Column field="firstName" header="Имя" sortable>
         <template #body="{ data }">
@@ -44,7 +44,7 @@
               class="subscription-expiry"
             >
               <small class="text-muted">
-                До: {{ formatDate(data.subscriptionEndsAt) }}
+                До: {{ formatDate(data.subscriptionEndsAt, "short") }}
               </small>
             </div>
           </div>
@@ -52,7 +52,7 @@
       </Column>
       <Column field="createdAt" header="Дата регистрации" sortable>
         <template #body="{ data }">
-          {{ formatDate(data.createdAt) }}
+          {{ formatDate(data.createdAt, "short") }}
         </template>
       </Column>
       <Column header="Действия">
@@ -91,8 +91,13 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Tag from "primevue/tag";
 import { computed } from "vue";
-import { formatDate, getSubscriptionLabel, getSubscriptionSeverity } from "../model/useUsersTable";
-import type { UsersTableProps, UsersTableEmits, User } from "../model/types";
+import { formatDate } from "@shared/utils";
+import {
+  getSubscriptionLabel,
+  getSubscriptionSeverity,
+} from "../model/useUsersTable";
+import type { UsersTableProps, UsersTableEmits } from "../model/types";
+import type { PageEvent } from "@shared/ui/Table";
 
 const props = defineProps<UsersTableProps>();
 const emit = defineEmits<UsersTableEmits>();
@@ -101,16 +106,15 @@ const filteredUsers = computed(() => {
   let result = props.users;
   if (props.subscriptionFilter) {
     result = result.filter(
-      (user) => user.subscriptionType === props.subscriptionFilter
+      (user) => user.subscriptionType === props.subscriptionFilter,
     );
   }
   return result;
 });
 
-const handlePageChange = (event: any) => {
+const handlePageChange = (event: PageEvent) => {
   emit("page-change", { page: event.page + 1, rows: event.rows });
 };
 </script>
 
 <style scoped src="../style/admin-users-table.css"></style>
-
