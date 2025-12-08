@@ -1,4 +1,4 @@
-.PHONY: help dev prod build clean clean-cache logs shell db-shell install
+.PHONY: help dev prod build clean clean-cache logs shell db-shell install dev-standalone prod-standalone
 
 # Загружаем переменные из .env файла
 -include .env
@@ -17,7 +17,7 @@ RESET := \033[0m
 
 help: ## Показать список доступных команд
 	@echo "$(GREEN)Доступные команды:$(RESET)"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-15s$(RESET) %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-20s$(RESET) %s\n", $$1, $$2}'
 
 install: ## Установить зависимости
 	@echo "$(GREEN)Устанавливаем зависимости...$(RESET)"
@@ -201,3 +201,80 @@ debug: ## Режим отладки - показать подробную инф
 	@echo ""
 	@echo "$(GREEN)=== Volumes ===$(RESET)"
 	@docker volume ls | grep $(APP_NAME) || echo "Нет volumes"
+
+# ============================================
+# Standalone режим (для опенсорс использования)
+# ============================================
+
+dev-standalone: ## Запустить в standalone режиме (development)
+	@echo "$(GREEN)Запускаем standalone режим (development)...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml up --build
+
+dev-standalone-d: ## Запустить в standalone режиме в фоне (development)
+	@echo "$(GREEN)Запускаем standalone режим в фоне (development)...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml up --build -d
+
+prod-standalone: ## Запустить в standalone режиме (production)
+	@echo "$(GREEN)Запускаем standalone режим (production)...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.prod.yml up --build -d
+
+stop-standalone: ## Остановить standalone контейнеры
+	@echo "$(YELLOW)Останавливаем standalone контейнеры...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml down 2>/dev/null || true
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.prod.yml down 2>/dev/null || true
+
+build-standalone: ## Собрать образы для standalone
+	@echo "$(GREEN)Собираем образы для standalone...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml build
+
+build-standalone-prod: ## Собрать production образы для standalone
+	@echo "$(GREEN)Собираем production образы для standalone...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.prod.yml build
+
+logs-standalone: ## Показать логи standalone
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml logs -f
+
+logs-standalone-prod: ## Показать логи standalone production
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.prod.yml logs -f
+
+db-migrate-standalone: ## Запустить миграции в standalone контейнере
+	@echo "$(GREEN)Запускаем миграции в standalone режиме...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app bunx prisma generate
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app bunx prisma migrate dev
+
+db-seed-standalone: ## Заполнить базу тестовыми данными в standalone
+	@echo "$(GREEN)Заполняем базу тестовыми данными в standalone режиме...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app bunx prisma generate
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app bunx prisma db seed
+
+db-studio-standalone: ## Открыть Prisma Studio в standalone
+	@echo "$(GREEN)Открываем Prisma Studio в standalone режиме...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app bunx prisma studio
+
+db-shell-standalone: ## Подключиться к базе данных в standalone
+	@echo "$(GREEN)Подключаемся к базе данных в standalone режиме...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec db psql -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-test_platform}
+
+shell-standalone: ## Подключиться к контейнеру приложения в standalone
+	@echo "$(GREEN)Подключаемся к контейнеру в standalone режиме...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app /bin/bash
+
+clean-standalone: ## Остановить и удалить standalone контейнеры и volumes
+	@echo "$(RED)Очищаем standalone контейнеры и volumes...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml down -v 2>/dev/null || true
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.prod.yml down -v 2>/dev/null || true
+	@echo "$(GREEN)Очистка standalone завершена!$(RESET)"
+
+setup-standalone: ## Первоначальная настройка проекта в standalone режиме
+	@echo "$(GREEN)Настройка проекта в standalone режиме...$(RESET)"
+	@if [ ! -f .env ]; then \
+		echo "$(YELLOW)Копируем .env.example в .env$(RESET)"; \
+		cp .env.example .env; \
+	fi
+	@echo "$(GREEN)Запускаем контейнеры...$(RESET)"
+	$(MAKE) dev-standalone-d
+	@echo "$(GREEN)Ожидаем запуск контейнеров...$(RESET)"
+	sleep 10
+	@echo "$(GREEN)Генерируем Prisma Client...$(RESET)"
+	COMPOSE_PROJECT_NAME=$(APP_NAME) docker compose -f docker-compose.standalone.yml exec app bunx prisma generate
+	@echo "$(GREEN)Проект настроен в standalone режиме! Доступен по адресу: http://localhost:3000$(RESET)"

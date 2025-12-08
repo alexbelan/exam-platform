@@ -1,0 +1,93 @@
+# ============================================
+# Standalone Docker Compose для самостоятельного запуска
+#
+# Этот файл позволяет запустить приложение
+# полностью автономно, без внешних зависимостей
+# ============================================
+
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-test_platform}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-test_platform}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  # Main Platform Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    environment:
+      # Database connection (автоматически формируется из переменных БД)
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-test_platform}
+      # Prisma settings
+      - PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+      - PRISMA_SKIP_POSTINSTALL_GENERATE=1
+      # Application settings
+      - NODE_ENV=development
+      - NITRO_HOST=0.0.0.0
+      - NITRO_PORT=3000
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Source code для hot-reload
+      - ./src:/usr/src/app/src
+      - ./server:/usr/src/app/server
+      - ./prisma:/usr/src/app/prisma
+      - ./public:/usr/src/app/public
+      - ./types:/usr/src/app/types
+      # Config files
+      - ./nuxt.config.ts:/usr/src/app/nuxt.config.ts
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+      - ./package.json:/usr/src/app/package.json
+      - ./bun.lock:/usr/src/app/bun.lock
+      - ./eslint.config.mjs:/usr/src/app/eslint.config.mjs
+      - ./.env:/usr/src/app/.env
+      # Cache volumes (для ускорения)
+      - node_modules:/usr/src/app/node_modules
+      - .nuxt:/usr/src/app/.nuxt
+      - .output:/usr/src/app/.output
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  node_modules:
+    driver: local
+  .nuxt:
+    driver: local
+  .output:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
