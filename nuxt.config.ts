@@ -40,9 +40,6 @@ export default defineNuxtConfig({
       routes: ["/", "/login"],
       crawlLinks: true,
     },
-    scheduledTasks: {
-      "0 */12 * * *": ["token-cleanup"],
-    },
   },
   ssr: true,
 
@@ -59,6 +56,7 @@ export default defineNuxtConfig({
     "@primevue/nuxt-module",
     "nuxt-auth-utils",
     "nuxt-color-picker",
+    "nuxt-cron",
   ],
   primevue: {
     importTheme: { from: "~/themes/theme.ts" },
@@ -96,7 +94,7 @@ export default defineNuxtConfig({
       },
     },
     public: {
-      // Публичные переменные (если нужны на клиенте)
+      companyName: process.env.COMPANY_NAME,
     },
   },
 });

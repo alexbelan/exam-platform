@@ -2,7 +2,7 @@
   <section class="hero-section">
     <div class="mobile-background">
       <img src="/images/home1.png" alt="Background" class="mobile-bg-image" />
-      <div class="mobile-overlay"></div>
+      <div class="mobile-overlay" />
     </div>
 
     <div class="hero-container">
@@ -10,11 +10,11 @@
         <div class="hero-text">
           <h1 class="hero-title">
             Сделаем подготовку
-            <span class="brand-name">эффективной</span>
+            <span class="brand-name">{{ companyName }}</span>
           </h1>
           <p class="hero-description">
-            Современная платформа для прохождения тестов и подготовки к экзаменам.
-            Отслеживайте прогресс и улучшайте свои знания.
+            Современная платформа для прохождения тестов и подготовки к
+            экзаменам. Отслеживайте прогресс и улучшайте свои знания.
           </p>
           <div class="hero-actions">
             <Button
@@ -34,8 +34,8 @@
             alt="Платформа для тестирования"
             class="desktop-hero-image"
           />
-          <div class="image-gradient-left"></div>
-          <div class="image-gradient-vertical"></div>
+          <div class="image-gradient-left" />
+          <div class="image-gradient-vertical" />
         </div>
       </div>
     </div>
@@ -43,6 +43,18 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import type { Project } from "../../model/types";
+
+const runtimeConfig = useRuntimeConfig();
+const companyName = computed(
+  () => runtimeConfig.public.companyName || "эффективной",
+);
+
+defineProps<{
+  projects: Project[];
+}>();
+
 defineEmits<{
   "start-learning": [];
 }>();
@@ -53,12 +65,10 @@ defineEmits<{
 .hero-section {
   position: relative;
   display: flex;
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
   background-color: #030712;
   color: white;
-  overflow: hidden;
 }
 
 /* Фоновое изображение для мобильных */
@@ -90,7 +100,7 @@ defineEmits<{
 .hero-container {
   max-width: 1280px;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -160,7 +170,9 @@ defineEmits<{
   min-height: 100vh;
   width: 65%;
   z-index: 1;
-  transition: width 0.3s ease, right 0.3s ease;
+  transition:
+    width 0.3s ease,
+    right 0.3s ease;
 }
 
 .image-container {
@@ -199,7 +211,8 @@ defineEmits<{
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
+  background:
+    linear-gradient(
       to bottom,
       #030712 0%,
       rgba(3, 7, 18, 0.7) 15%,
@@ -232,7 +245,7 @@ defineEmits<{
     justify-content: flex-start;
     padding: 2rem 2rem 2rem 4rem;
     max-width: 1400px;
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .hero-content {
@@ -255,7 +268,7 @@ defineEmits<{
   .hero-container {
     max-width: 1600px;
     padding: 2rem 2rem 2rem 6rem;
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .hero-content {
@@ -283,7 +296,7 @@ defineEmits<{
   .hero-container {
     max-width: 2000px;
     padding: 2rem 2rem 2rem 8rem;
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .hero-content {
@@ -311,7 +324,7 @@ defineEmits<{
   .hero-container {
     max-width: 2400px;
     padding: 2rem 2rem 2rem 10rem;
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .hero-content {
@@ -338,7 +351,7 @@ defineEmits<{
   .hero-container {
     max-width: 1800px;
     padding: 2rem 2rem 2rem 8rem;
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .hero-content {
@@ -367,7 +380,7 @@ defineEmits<{
     flex-direction: column;
     text-align: center;
     padding: 2rem 1rem;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
   }
 

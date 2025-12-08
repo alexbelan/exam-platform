@@ -9,17 +9,13 @@
     />
 
     <!-- Hero Section -->
-    <HeroSection @start-learning="handleStartLearning" />
-
-    <!-- Projects Section -->
-    <ProjectsSection :projects="projects" />
+    <HeroSection :projects="projects" @start-learning="handleStartLearning" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { AuthButtons } from "./AuthButtons";
 import { HeroSection } from "./HeroSection";
-import { ProjectsSection } from "./ProjectsSection";
 import { useHomePage } from "../model/useHomePage";
 
 // SEO Meta tags

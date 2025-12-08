@@ -5,13 +5,13 @@
       <span v-if="props.required" class="required">*</span>
     </label>
     <Editor
-      :modelValue="props.modelValue"
-      @update:modelValue="handleUpdate"
-      :editorStyle="props.editorStyle"
+      :model-value="props.modelValue"
+      :editor-style="props.editorStyle"
       class="text-editor"
       :modules="editorModules"
+      @update:model-value="handleUpdate"
     >
-      <template v-slot:toolbar>
+      <template #toolbar>
         <span class="ql-formats">
           <select class="ql-header" title="Заголовок">
             <option value="">Обычный текст</option>
@@ -20,48 +20,23 @@
           </select>
         </span>
         <span class="ql-formats">
-          <button class="ql-bold" title="Жирный"></button>
-          <button class="ql-italic" title="Курсив"></button>
-          <button class="ql-underline" title="Подчеркнутый"></button>
+          <button class="ql-bold" title="Жирный" />
+          <button class="ql-italic" title="Курсив" />
+          <button class="ql-underline" title="Подчеркнутый" />
         </span>
         <span class="ql-formats">
-          <button
-            class="ql-list"
-            value="ordered"
-            title="Нумерованный список"
-          ></button>
-          <button
-            class="ql-list"
-            value="bullet"
-            title="Маркированный список"
-          ></button>
-          <button
-            class="ql-indent"
-            value="-1"
-            title="Уменьшить отступ"
-          ></button>
-          <button
-            class="ql-indent"
-            value="+1"
-            title="Увеличить отступ"
-          ></button>
+          <button class="ql-list" value="ordered" title="Нумерованный список" />
+          <button class="ql-list" value="bullet" title="Маркированный список" />
+          <button class="ql-indent" value="-1" title="Уменьшить отступ" />
+          <button class="ql-indent" value="+1" title="Увеличить отступ" />
         </span>
         <span class="ql-formats">
-          <button class="ql-blockquote" title="Цитата"></button>
-          <button class="ql-link" title="Ссылка"></button>
+          <button class="ql-blockquote" title="Цитата" />
+          <button class="ql-link" title="Ссылка" />
         </span>
         <span class="ql-formats">
-          <!-- <select class="ql-code-block" title="">
-            <option
-              v-for="lang in supportedLanguages"
-              :key="lang.value"
-              :value="lang.value"
-            >
-              {{ lang.label }}
-            </option>
-          </select> -->
-          <button class="ql-code-block" title="Блок кода"></button>
-          <button class="ql-code" title="Инлайн код"></button>
+          <button class="ql-code-block" title="Блок кода" />
+          <button class="ql-code" title="Инлайн код" />
         </span>
       </template>
     </Editor>
@@ -72,6 +47,14 @@
 <script setup lang="ts">
 import Editor from "primevue/editor";
 import hljs from "highlight.js";
+import type { HLJSApi } from "highlight.js";
+
+// Расширяем интерфейс Window для добавления свойства hljs
+declare global {
+  interface Window {
+    hljs?: HLJSApi;
+  }
+}
 
 interface Props {
   modelValue: string;
@@ -81,10 +64,8 @@ interface Props {
   required?: boolean;
 }
 
-if (process.client) {
-  (window as any).hljs = hljs;
-  // Альтернативно можно использовать window.highlight
-  // (window as any).highlight = hljs;
+if (import.meta.client) {
+  window.hljs = hljs;
 }
 
 const props = withDefaults(defineProps<Props>(), {
