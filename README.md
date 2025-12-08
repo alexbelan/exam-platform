@@ -50,11 +50,11 @@ cd <project-directory>
 # Скопируйте файл с переменными окружения
 cp .env.example .env
 
-# Запустите первоначальную настройку в standalone режиме
-make setup-standalone
+# Запустите первоначальную настройку
+make setup
 ```
 
-После выполнения команды `make setup-standalone` проект будет доступен по адресу: http://localhost:3000
+После выполнения команды `make setup` проект будет доступен по адресу: http://localhost:3000
 
 ### Вариант 2: Локальная разработка (без Docker)
 
@@ -78,9 +78,9 @@ bunx prisma db seed
 bun run dev
 ```
 
-### Вариант 3: Стандартный Docker режим
+### Вариант 3: Docker режим
 
-Для использования с существующей инфраструктурой:
+Для использования с Docker:
 
 ```bash
 # 1. Установите зависимости
@@ -101,74 +101,56 @@ make db-seed
 
 ## 🐳 Docker команды
 
-Проект использует Docker для изоляции окружения. Все команды доступны через Makefile:
+Проект использует Docker для изоляции окружения в Standalone режиме. Все команды доступны через Makefile:
 
-### Standalone режим (рекомендуется)
-
-```bash
-make dev-standalone        # Запустить в standalone режиме (development)
-make dev-standalone-d      # Запустить в standalone режиме в фоне
-make prod-standalone       # Запустить в standalone режиме (production)
-make stop-standalone       # Остановить standalone контейнеры
-make logs-standalone       # Показать логи standalone
-make db-migrate-standalone # Запустить миграции в standalone
-make db-seed-standalone    # Заполнить базу тестовыми данными
-make db-studio-standalone  # Открыть Prisma Studio
-make shell-standalone      # Подключиться к контейнеру
-make clean-standalone      # Очистить standalone контейнеры и volumes
-make setup-standalone      # Первоначальная настройка в standalone режиме
-```
-
-### Стандартные команды
+### Основные команды
 
 ```bash
 make dev          # Запустить в режиме разработки
+make dev-d        # Запустить в режиме разработки в фоне
 make prod         # Запустить в production режиме
 make stop         # Остановить контейнеры
-make restart      # Перезапустить контейнеры
-make logs         # Показать логи контейнеров
+make restart      # Перезапустить контейнеры (development)
+make restart-prod # Перезапустить production контейнеры
+make logs         # Показать логи development
+make logs-prod    # Показать логи production
+make status       # Показать статус контейнеров
+make setup        # Первоначальная настройка проекта
 ```
 
 ### Сборка
 
 ```bash
 make build        # Собрать образы для разработки
-make build-prod   # Собрать production образ
-make build-ssg    # Собрать SSG образ (статический сайт)
+make build-prod   # Собрать production образы
 ```
 
 ### База данных
 
 ```bash
-# Standalone режим
-make db-migrate-standalone   # Запустить миграции в standalone
-make db-seed-standalone      # Заполнить базу тестовыми данными
-make db-studio-standalone    # Открыть Prisma Studio
-make db-shell-standalone     # Подключиться к базе данных через psql
-
-# Стандартный режим
-make db-generate  # Сгенерировать Prisma Client
-make db-migrate   # Запустить миграции
-make db-seed      # Заполнить базу тестовыми данными
-make db-studio    # Открыть Prisma Studio
-make db-shell     # Подключиться к базе данных через psql
+make db-generate              # Сгенерировать Prisma Client
+make db-migrate               # Запустить миграции Prisma
+make db-seed                  # Заполнить базу тестовыми данными
+make db-seed-interview-questions # Заполнить базу вопросами для интервью
+make db-studio                # Открыть Prisma Studio
+make db-shell                 # Подключиться к базе данных через psql
 ```
 
 ### Очистка
 
 ```bash
-make clean        # Остановить и удалить контейнеры, образы, volumes
-make clean-cache  # Очистить только кэш директории (.nuxt, .output)
-make clean-all    # Полная очистка: контейнеры, volumes, кэш
+make clean              # Остановить и удалить контейнеры, образы, volumes
+make clean-cache        # Очистить только кэш директории (.nuxt, .output)
+make clean-docker-cache # Очистить Docker volumes с кэшем Nuxt
+make clean-all          # Полная очистка: контейнеры, volumes, кэш
 ```
 
 ### Утилиты
 
 ```bash
 make help         # Показать список всех доступных команд
-make status       # Показать статус контейнеров
+make install      # Установить зависимости
 make shell        # Подключиться к контейнеру приложения
-make debug        # Режим отладки с подробной информацией
 ```
 
 ## 📁 Структура проекта
@@ -253,17 +235,7 @@ API endpoints находятся в директории `server/api/`:
 
 ## 🏗 Production
 
-### Standalone режим (рекомендуется)
-
-```bash
-# Сборка production образа
-make build-standalone-prod
-
-# Запуск в production режиме
-make prod-standalone
-```
-
-### Стандартный режим
+Для запуска в production режиме:
 
 ```bash
 # Сборка production образа
@@ -271,15 +243,12 @@ make build-prod
 
 # Запуск в production режиме
 make prod
-```
 
-### Статическая генерация (SSG)
+# Просмотр логов production
+make logs-prod
 
-Для генерации статического сайта:
-
-```bash
-make build-ssg    # Собрать SSG образ
-make run-ssg       # Запустить SSG версию
+# Перезапуск production контейнеров
+make restart-prod
 ```
 
 ## 📝 Скрипты
